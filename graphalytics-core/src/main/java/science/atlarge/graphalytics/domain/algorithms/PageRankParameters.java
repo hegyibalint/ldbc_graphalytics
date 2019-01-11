@@ -17,9 +17,9 @@
  */
 package science.atlarge.graphalytics.domain.algorithms;
 
+import org.apache.commons.configuration.Configuration;
 import science.atlarge.graphalytics.configuration.ConfigurationUtil;
 import science.atlarge.graphalytics.configuration.InvalidConfigurationException;
-import org.apache.commons.configuration.Configuration;
 
 /**
  * Parameters for the execution of the PageRank algorithm. These parameters include a set number of iterations to run
@@ -31,54 +31,54 @@ import org.apache.commons.configuration.Configuration;
  */
 public final class PageRankParameters extends AlgorithmParameters {
 
-	private final float dampingFactor;
-	private final int numberOfIterations;
+    private final float dampingFactor;
+    private final int numberOfIterations;
 
-	/**
-	 * @param dampingFactor      the damping factor to use for the PageRank algorithm
-	 * @param numberOfIterations the number of iterations to run the PageRank algorithm for
-	 */
-	public PageRankParameters(float dampingFactor, int numberOfIterations) {
-		this.dampingFactor = dampingFactor;
-		this.numberOfIterations = numberOfIterations;
-	}
+    /**
+     * @param dampingFactor      the damping factor to use for the PageRank algorithm
+     * @param numberOfIterations the number of iterations to run the PageRank algorithm for
+     */
+    public PageRankParameters(float dampingFactor, int numberOfIterations) {
+        this.dampingFactor = dampingFactor;
+        this.numberOfIterations = numberOfIterations;
+    }
 
-	/**
-	 * @return the damping factor to use for the PageRank algorithm
-	 */
-	public float getDampingFactor() {
-		return dampingFactor;
-	}
+    /**
+     * @return the damping factor to use for the PageRank algorithm
+     */
+    public float getDampingFactor() {
+        return dampingFactor;
+    }
 
-	/**
-	 * @return the number of iterations to run the PageRank algorithm for
-	 */
-	public int getNumberOfIterations() {
-		return numberOfIterations;
-	}
-
-
-	/**
-	 * Factory for parsing a PageRankParameters object from the properties of a Configuration object.
-	 */
-	public static final class PageRankParametersFactory implements ParameterFactory<PageRankParameters> {
-
-		@Override
-		public PageRankParameters fromConfiguration(Configuration configuration)
-				throws InvalidConfigurationException {
-			return new PageRankParameters(ConfigurationUtil.getFloat(configuration, "damping-factor"),
-					ConfigurationUtil.getInteger(configuration, "num-iterations"));
-		}
-
-	}
+    /**
+     * @return the number of iterations to run the PageRank algorithm for
+     */
+    public int getNumberOfIterations() {
+        return numberOfIterations;
+    }
 
 
-	@Override
-	public String toString() {
-		return String.format("PR[%s]", getDescription());
-	}
+    /**
+     * Factory for parsing a PageRankParameters object from the properties of a Configuration object.
+     */
+    public static final class PageRankParametersFactory implements ParameterFactory<PageRankParameters> {
 
-	public String getDescription() {
-		return String.format("damp=%s, iter=%s", dampingFactor, numberOfIterations);
-	}
+        @Override
+        public PageRankParameters fromConfiguration(Configuration configuration)
+                throws InvalidConfigurationException {
+            return new PageRankParameters(ConfigurationUtil.getFloat(configuration, "damping-factor"),
+                    ConfigurationUtil.getInteger(configuration, "num-iterations"));
+        }
+
+    }
+
+
+    @Override
+    public String toString() {
+        return String.format("PR[%s]", getDescription());
+    }
+
+    public String getDescription() {
+        return String.format("damp=%s, iter=%s", dampingFactor, numberOfIterations);
+    }
 }

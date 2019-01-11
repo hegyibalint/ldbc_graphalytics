@@ -17,18 +17,20 @@
  */
 package science.atlarge.graphalytics.domain.benchmark;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import science.atlarge.graphalytics.configuration.ConfigurationUtil;
 import science.atlarge.graphalytics.configuration.InvalidConfigurationException;
 import science.atlarge.graphalytics.domain.algorithms.Algorithm;
 import science.atlarge.graphalytics.domain.algorithms.AlgorithmParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
-import org.apache.commons.configuration.Configuration;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Wing Lung Ngai
@@ -36,7 +38,6 @@ import java.util.*;
 public class CustomBenchmark extends Benchmark {
 
     private static final Logger LOG = LogManager.getLogger();
-
 
     private static final String BENCHMARK_PROPERTIES_FILE = "benchmark.properties";
     private static final String BENCHMARK_RUN_GRAPHS_KEY = "benchmark.custom.graphs";
@@ -96,12 +97,12 @@ public class CustomBenchmark extends Benchmark {
         BenchmarkExp experiment = new BenchmarkExp("custom:exp");
         experiments.add(experiment);
 
-       benchmarkRuns = new HashSet<>();
+        benchmarkRuns = new HashSet<>();
         for (Algorithm algorithm : algorithmSelection) {
             for (Graph graph : graphSelection) {
 
                 // if graph does not support algorithm, skip.
-                if(!graph.getAlgorithmParameters().containsKey(algorithm)) {
+                if (!graph.getAlgorithmParameters().containsKey(algorithm)) {
                     LOG.error(String.format("Skipping benchmark %s on %s: " +
                                     "algorithm %s cannot run on dataset %s.",
                             algorithm.getAcronym(), graph.getName(),

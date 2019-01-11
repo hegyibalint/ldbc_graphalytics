@@ -26,9 +26,9 @@ import science.atlarge.graphalytics.report.result.BenchmarkResult;
  */
 public interface BenchmarkReportGenerator {
 
-	/**
-	 * @param result the results of running a benchmark suite from which a report is to be generated
-	 */
-	BenchmarkReport generateReportFromResults(BenchmarkResult result);
+    /**
+     * @param result the results of running a benchmark suite from which a report is to be generated
+     */
+    BenchmarkReport generateReportFromResults(BenchmarkResult result);
 
 }

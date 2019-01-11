@@ -27,34 +27,34 @@ import java.io.*;
  */
 public class VertexListStreamWriter implements AutoCloseable {
 
-	private final VertexListStream inputStream;
-	private final Writer outputWriter;
+    private final VertexListStream inputStream;
+    private final Writer outputWriter;
 
-	public VertexListStreamWriter(VertexListStream inputStream, OutputStream outputStream) {
-		this.inputStream = inputStream;
-		this.outputWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
-	}
+    public VertexListStreamWriter(VertexListStream inputStream, OutputStream outputStream) {
+        this.inputStream = inputStream;
+        this.outputWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+    }
 
-	public void writeAll() throws IOException {
-		while (inputStream.hasNextVertex()) {
-			writeNextVertex();
-		}
-		outputWriter.flush();
-	}
+    public void writeAll() throws IOException {
+        while (inputStream.hasNextVertex()) {
+            writeNextVertex();
+        }
+        outputWriter.flush();
+    }
 
-	private void writeNextVertex() throws IOException {
-		VertexListStream.VertexData vertexData = inputStream.getNextVertex();
-		outputWriter.write(String.valueOf(vertexData.getId()));
-		for (String value : vertexData.getValues()) {
-			outputWriter.append(' ');
-			outputWriter.write(value);
-		}
-		outputWriter.append('\n');
-	}
+    private void writeNextVertex() throws IOException {
+        VertexListStream.VertexData vertexData = inputStream.getNextVertex();
+        outputWriter.write(String.valueOf(vertexData.getId()));
+        for (String value : vertexData.getValues()) {
+            outputWriter.append(' ');
+            outputWriter.write(value);
+        }
+        outputWriter.append('\n');
+    }
 
-	@Override
-	public void close() throws IOException {
-		outputWriter.close();
-	}
+    @Override
+    public void close() throws IOException {
+        outputWriter.close();
+    }
 
 }

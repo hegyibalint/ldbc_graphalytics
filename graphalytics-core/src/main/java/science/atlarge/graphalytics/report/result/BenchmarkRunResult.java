@@ -33,52 +33,52 @@ import java.io.Serializable;
  */
 public final class BenchmarkRunResult implements Serializable {
 
-	private BenchmarkRun benchmarkRun;
-	private BenchmarkStatus status;
-	private BenchmarkFailures failures;
-	private BenchmarkMetrics metrics;
+    private BenchmarkRun benchmarkRun;
+    private BenchmarkStatus status;
+    private BenchmarkFailures failures;
+    private BenchmarkMetrics metrics;
 
-	/**
-	 * @param benchmarkRun the benchmark executed to obtain this result
-	 */
-	public BenchmarkRunResult(BenchmarkRun benchmarkRun, BenchmarkStatus status,
-							  BenchmarkFailures failures, BenchmarkMetrics metrics) {
-		this.benchmarkRun = benchmarkRun;
-		this.failures = failures;
-		this.metrics = metrics;
-		this.status = status;
-	}
+    /**
+     * @param benchmarkRun the benchmark executed to obtain this result
+     */
+    public BenchmarkRunResult(BenchmarkRun benchmarkRun, BenchmarkStatus status,
+                              BenchmarkFailures failures, BenchmarkMetrics metrics) {
+        this.benchmarkRun = benchmarkRun;
+        this.failures = failures;
+        this.metrics = metrics;
+        this.status = status;
+    }
 
-	/**
-	 * Creates an empty BenchmarkRunResult for a benchmark that has not been run.
-	 *
-	 * @param benchmarkRun the benchmark that has not been run
-	 * @return a new empty BenchmarkRunResult
-	 */
-	public static BenchmarkRunResult emptyBenchmarkRun(BenchmarkRun benchmarkRun) {
-		return new BenchmarkRunResult(benchmarkRun, new BenchmarkStatus(), new BenchmarkFailures(), new BenchmarkMetrics());
-	}
+    /**
+     * Creates an empty BenchmarkRunResult for a benchmark that has not been run.
+     *
+     * @param benchmarkRun the benchmark that has not been run
+     * @return a new empty BenchmarkRunResult
+     */
+    public static BenchmarkRunResult emptyBenchmarkRun(BenchmarkRun benchmarkRun) {
+        return new BenchmarkRunResult(benchmarkRun, new BenchmarkStatus(), new BenchmarkFailures(), new BenchmarkMetrics());
+    }
 
-	public BenchmarkMetrics getMetrics() {
-		return metrics;
-	}
+    public BenchmarkMetrics getMetrics() {
+        return metrics;
+    }
 
-	/**
-	 * @return the benchmark executed to obtain this result
-	 */
-	public BenchmarkRun getBenchmarkRun() {
-		return benchmarkRun;
-	}
+    /**
+     * @return the benchmark executed to obtain this result
+     */
+    public BenchmarkRun getBenchmarkRun() {
+        return benchmarkRun;
+    }
 
-	public BenchmarkFailures getFailures() {
-		return failures;
-	}
+    public BenchmarkFailures getFailures() {
+        return failures;
+    }
 
-	public BenchmarkStatus getStatus() {
-		return status;
-	}
+    public BenchmarkStatus getStatus() {
+        return status;
+    }
 
-	public boolean isSuccessful() {
-		return status.isValidated() && failures.hasNone();
-	}
+    public boolean isSuccessful() {
+        return status.isValidated() && failures.hasNone();
+    }
 }

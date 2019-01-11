@@ -17,8 +17,8 @@
  */
 package science.atlarge.graphalytics.plugin;
 
-import science.atlarge.graphalytics.execution.Platform;
 import science.atlarge.graphalytics.domain.benchmark.Benchmark;
+import science.atlarge.graphalytics.execution.Platform;
 import science.atlarge.graphalytics.report.BenchmarkReportWriter;
 
 /**
@@ -28,6 +28,6 @@ import science.atlarge.graphalytics.report.BenchmarkReportWriter;
  */
 public interface PluginFactory {
 
-	Plugin instantiatePlugin(Platform targetPlatform, Benchmark benchmark, BenchmarkReportWriter reportWriter);
+    Plugin instantiatePlugin(Platform targetPlatform, Benchmark benchmark, BenchmarkReportWriter reportWriter);
 
 }

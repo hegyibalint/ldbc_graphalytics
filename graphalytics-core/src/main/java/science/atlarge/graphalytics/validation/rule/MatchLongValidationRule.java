@@ -26,13 +26,13 @@ package science.atlarge.graphalytics.validation.rule;
  */
 public class MatchLongValidationRule implements ValidationRule<Long> {
 
-	@Override
-	public Long parse(String val) throws NumberFormatException {
-		return Long.parseLong(val);
-	}
+    @Override
+    public Long parse(String val) throws NumberFormatException {
+        return Long.parseLong(val);
+    }
 
-	@Override
-	public boolean match(Long lhs, Long rhs) {
-		return lhs != null && rhs != null && lhs.equals(rhs);
-	}
+    @Override
+    public boolean match(Long lhs, Long rhs) {
+        return lhs != null && rhs != null && lhs.equals(rhs);
+    }
 }

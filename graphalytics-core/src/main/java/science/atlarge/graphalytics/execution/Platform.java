@@ -20,7 +20,6 @@ package science.atlarge.graphalytics.execution;
 import science.atlarge.graphalytics.domain.graph.FormattedGraph;
 import science.atlarge.graphalytics.domain.graph.LoadedGraph;
 import science.atlarge.graphalytics.report.result.BenchmarkMetrics;
-import science.atlarge.graphalytics.domain.benchmark.BenchmarkRun;
 
 /**
  * The common interface for any platform that implements the Graphalytics benchmark suite. It
@@ -46,7 +45,7 @@ public interface Platform {
      * The platform converts the “formatted data" into any platform-specific data format and
      * loads a graph dataset into a storage system, which can be either a local file system,
      * a share file system or a distributed file system.
-     *
+     * <p>
      * The platform driver must ensure that this dataset remains available until the removal of
      * the graph is triggered using {@link #deleteGraph(LoadedGraph) deleteGraph}.
      *
@@ -58,6 +57,7 @@ public interface Platform {
     /**
      * The platform requests computation resources from the cluster environment and
      * makes the background applications ready.
+     *
      * @param runSpecification job specification of a benchmark run.
      */
     void prepare(RunSpecification runSpecification) throws Exception;
@@ -77,7 +77,7 @@ public interface Platform {
      *
      * @param runSpecification job specification of a benchmark run.
      * @throws PlatformExecutionException if any exception occurred
-     * during the execution of the algorithm.
+     *                                    during the execution of the algorithm.
      */
     void run(RunSpecification runSpecification) throws PlatformExecutionException;
 

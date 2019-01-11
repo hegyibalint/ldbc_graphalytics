@@ -22,7 +22,7 @@ import java.io.Serializable;
 /**
  * @author Wing Lung Ngai
  */
-public class BenchmarkMetrics implements Serializable{
+public class BenchmarkMetrics implements Serializable {
     private BenchmarkMetric loadTime;
     private BenchmarkMetric makespan;
     private BenchmarkMetric processingTime;

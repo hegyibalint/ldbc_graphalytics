@@ -32,64 +32,64 @@ import java.util.NoSuchElementException;
  */
 public class EdgeListInputStreamReader implements EdgeListStream {
 
-	private final BufferedReader reader;
-	private final EdgeData cache = new EdgeData();
-	private boolean cacheValid;
+    private final BufferedReader reader;
+    private final EdgeData cache = new EdgeData();
+    private boolean cacheValid;
 
-	public EdgeListInputStreamReader(InputStream inputStream) {
-		 reader = new BufferedReader(new InputStreamReader(inputStream));
-	}
+    public EdgeListInputStreamReader(InputStream inputStream) {
+        reader = new BufferedReader(new InputStreamReader(inputStream));
+    }
 
-	@Override
-	public boolean hasNextEdge() throws IOException {
-		if (cacheValid) {
-			return true;
-		} else {
-			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-				line = line.trim();
-				if (line.isEmpty()) {
-					continue;
-				}
+    @Override
+    public boolean hasNextEdge() throws IOException {
+        if (cacheValid) {
+            return true;
+        } else {
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                line = line.trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
 
-				String[] tokens = line.split(" ");
+                String[] tokens = line.split(" ");
 
-				if (tokens.length < 2) {
-					throw new IOException("Malformed edge data in stream: \"" + line + "\".");
-				}
+                if (tokens.length < 2) {
+                    throw new IOException("Malformed edge data in stream: \"" + line + "\".");
+                }
 
-				try {
-					cache.setSourceId(Long.parseLong(tokens[0]));
-					cache.setDestinationId(Long.parseLong(tokens[1]));
-				} catch (NumberFormatException ex) {
-					throw new IOException("Failed to parse vertex identifier from stream.", ex);
-				}
+                try {
+                    cache.setSourceId(Long.parseLong(tokens[0]));
+                    cache.setDestinationId(Long.parseLong(tokens[1]));
+                } catch (NumberFormatException ex) {
+                    throw new IOException("Failed to parse vertex identifier from stream.", ex);
+                }
 
-				if (cache.getValues().length == tokens.length - 2) {
-					System.arraycopy(tokens, 2, cache.getValues(), 0, tokens.length - 2);
-				} else {
-					cache.setValues(Arrays.copyOfRange(tokens, 2, tokens.length));
-				}
+                if (cache.getValues().length == tokens.length - 2) {
+                    System.arraycopy(tokens, 2, cache.getValues(), 0, tokens.length - 2);
+                } else {
+                    cache.setValues(Arrays.copyOfRange(tokens, 2, tokens.length));
+                }
 
-				cacheValid = true;
-				return true;
-			}
-			return false;
-		}
-	}
+                cacheValid = true;
+                return true;
+            }
+            return false;
+        }
+    }
 
-	@Override
-	public EdgeData getNextEdge() throws IOException {
-		if (!hasNextEdge()) {
-			throw new NoSuchElementException();
-		}
+    @Override
+    public EdgeData getNextEdge() throws IOException {
+        if (!hasNextEdge()) {
+            throw new NoSuchElementException();
+        }
 
-		cacheValid = false;
-		return cache;
-	}
+        cacheValid = false;
+        return cache;
+    }
 
-	@Override
-	public void close() throws IOException {
-		reader.close();
-	}
+    @Override
+    public void close() throws IOException {
+        reader.close();
+    }
 
 }

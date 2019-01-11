@@ -28,108 +28,108 @@ import java.util.*;
  */
 public class PropertyGraph<V, E> {
 
-	private final Map<Long, Vertex> vertices;
+    private final Map<Long, Vertex> vertices;
 
-	public PropertyGraph() {
-		this.vertices = new HashMap<>();
-	}
+    public PropertyGraph() {
+        this.vertices = new HashMap<>();
+    }
 
-	public void createVertex(long id, V value) {
-		if (vertices.containsKey(id)) {
-			throw new IllegalArgumentException("Vertex with id " + id + " already exists.");
-		}
-		vertices.put(id, new Vertex(id, value));
-	}
+    public void createVertex(long id, V value) {
+        if (vertices.containsKey(id)) {
+            throw new IllegalArgumentException("Vertex with id " + id + " already exists.");
+        }
+        vertices.put(id, new Vertex(id, value));
+    }
 
-	public void createEdge(long sourceVertexId, long destinationVertexId, E value) {
-		if (!vertices.containsKey(sourceVertexId)) {
-			throw new IllegalArgumentException("Source vertex with id " + sourceVertexId + " does not exist.");
-		}
-		if (!vertices.containsKey(destinationVertexId)) {
-			throw new IllegalArgumentException("Source vertex with id " + destinationVertexId + " does not exist.");
-		}
-		new Edge(vertices.get(sourceVertexId), vertices.get(destinationVertexId), value);
-	}
+    public void createEdge(long sourceVertexId, long destinationVertexId, E value) {
+        if (!vertices.containsKey(sourceVertexId)) {
+            throw new IllegalArgumentException("Source vertex with id " + sourceVertexId + " does not exist.");
+        }
+        if (!vertices.containsKey(destinationVertexId)) {
+            throw new IllegalArgumentException("Source vertex with id " + destinationVertexId + " does not exist.");
+        }
+        new Edge(vertices.get(sourceVertexId), vertices.get(destinationVertexId), value);
+    }
 
-	public Collection<Vertex> getVertices() {
-		return Collections.unmodifiableCollection(vertices.values());
-	}
+    public Collection<Vertex> getVertices() {
+        return Collections.unmodifiableCollection(vertices.values());
+    }
 
-	public Vertex getVertex(long id) {
-		return vertices.get(id);
-	}
+    public Vertex getVertex(long id) {
+        return vertices.get(id);
+    }
 
-	public class Vertex {
+    public class Vertex {
 
-		final long id;
-		final V value;
-		final Collection<Edge> outgoingEdges;
-		final Collection<Edge> incomingEdges;
+        final long id;
+        final V value;
+        final Collection<Edge> outgoingEdges;
+        final Collection<Edge> incomingEdges;
 
-		private Vertex(long id, V value) {
-			this.id = id;
-			this.value = value;
-			this.outgoingEdges = new ArrayList<>();
-			this.incomingEdges = new ArrayList<>();
-		}
+        private Vertex(long id, V value) {
+            this.id = id;
+            this.value = value;
+            this.outgoingEdges = new ArrayList<>();
+            this.incomingEdges = new ArrayList<>();
+        }
 
-		public long getId() {
-			return id;
-		}
+        public long getId() {
+            return id;
+        }
 
-		public V getValue() {
-			return value;
-		}
+        public V getValue() {
+            return value;
+        }
 
-		public Collection<Edge> getOutgoingEdges() {
-			return Collections.unmodifiableCollection(outgoingEdges);
-		}
+        public Collection<Edge> getOutgoingEdges() {
+            return Collections.unmodifiableCollection(outgoingEdges);
+        }
 
-		public Collection<Edge> getIncomingEdges() {
-			return Collections.unmodifiableCollection(incomingEdges);
-		}
+        public Collection<Edge> getIncomingEdges() {
+            return Collections.unmodifiableCollection(incomingEdges);
+        }
 
-		private void addEdge(Edge edge) {
-			if (edge.getSourceVertex() == this) {
-				outgoingEdges.add(edge);
-			} else {
-				incomingEdges.add(edge);
-			}
-		}
+        private void addEdge(Edge edge) {
+            if (edge.getSourceVertex() == this) {
+                outgoingEdges.add(edge);
+            } else {
+                incomingEdges.add(edge);
+            }
+        }
 
-	}
+    }
 
-	public class Edge {
+    public class Edge {
 
-		final Vertex sourceVertex;
-		final Vertex destinationVertex;
-		final E value;
+        final Vertex sourceVertex;
+        final Vertex destinationVertex;
+        final E value;
 
-		private Edge(Vertex sourceVertex, Vertex destinationVertex, E value) {
-			this.sourceVertex = sourceVertex;
-			this.destinationVertex = destinationVertex;
-			this.value = value;
+        private Edge(Vertex sourceVertex, Vertex destinationVertex, E value) {
+            this.sourceVertex = sourceVertex;
+            this.destinationVertex = destinationVertex;
+            this.value = value;
 
-			sourceVertex.addEdge(this);
-			destinationVertex.addEdge(this);
-		}
+            sourceVertex.addEdge(this);
+            destinationVertex.addEdge(this);
+        }
 
-		public Vertex getSourceVertex() {
-			return sourceVertex;
-		}
+        public Vertex getSourceVertex() {
+            return sourceVertex;
+        }
 
-		public Vertex getDestinationVertex() {
-			return destinationVertex;
-		}
+        public Vertex getDestinationVertex() {
+            return destinationVertex;
+        }
 
-		public E getValue() {
-			return value;
-		}
+        public E getValue() {
+            return value;
+        }
 
-		public Vertex getOtherEndpoint(Vertex vertex) {
-			return sourceVertex == vertex ? destinationVertex : sourceVertex;
-		}
+        public Vertex getOtherEndpoint(Vertex vertex) {
+            return sourceVertex == vertex ? destinationVertex : sourceVertex;
+        }
 
-	}
+    }
 
 }

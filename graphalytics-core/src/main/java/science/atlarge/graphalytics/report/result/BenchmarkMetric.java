@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 /**
  * @author Wing Lung Ngai
  */
-public class BenchmarkMetric implements Serializable{
+public class BenchmarkMetric implements Serializable {
     BigDecimal value;
     String unit;
     boolean isNan;

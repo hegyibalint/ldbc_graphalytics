@@ -17,7 +17,10 @@
  */
 package science.atlarge.graphalytics.validation;
 
-import it.unimi.dsi.fastutil.longs.*;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import science.atlarge.graphalytics.util.MemoryUtil;
@@ -31,8 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -45,142 +46,142 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Wing Lung Ngai
  */
 public class LongVertexValidator extends VertexValidator {
-	private static final Logger LOG = LogManager.getLogger(LongVertexValidator.class);
-	private static final long MAX_PRINT_ERROR_COUNT = 100;
+    private static final Logger LOG = LogManager.getLogger(LongVertexValidator.class);
+    private static final long MAX_PRINT_ERROR_COUNT = 100;
 
-	final private Path outputPath;
-	final private Path validationFile;
-	final private ValidationRule<Long> rule;
-	final private boolean verbose;
+    final private Path outputPath;
+    final private Path validationFile;
+    final private ValidationRule<Long> rule;
+    final private boolean verbose;
 
-	public LongVertexValidator(Path outputPath, Path validationFile, ValidationRule<Long> rule, boolean verbose) {
-		this.outputPath = outputPath;
-		this.validationFile = validationFile;
-		this.rule = rule;
-		this.verbose = verbose;
-	}
+    public LongVertexValidator(Path outputPath, Path validationFile, ValidationRule<Long> rule, boolean verbose) {
+        this.outputPath = outputPath;
+        this.validationFile = validationFile;
+        this.rule = rule;
+        this.verbose = verbose;
+    }
 
-	public boolean validate() throws ValidatorException {
-		Long2LongMap validationResults, outputResults;
+    public boolean validate() throws ValidatorException {
+        Long2LongMap validationResults, outputResults;
 
-		LOG.info("Validating contents of '" + outputPath + "'...");
-		LOG.info(MemoryUtil.getMemoryStats());
+        LOG.info("Validating contents of '" + outputPath + "'...");
+        LOG.info(MemoryUtil.getMemoryStats());
 
-		try {
-			validationResults = parseFileOrDirectory(validationFile);
-		} catch (IOException e) {
-			throw new ValidatorException("Failed to read validation file '" + validationFile + "'");
-		}
+        try {
+            validationResults = parseFileOrDirectory(validationFile);
+        } catch (IOException e) {
+            throw new ValidatorException("Failed to read validation file '" + validationFile + "'");
+        }
 
-		try {
-			outputResults = parseFileOrDirectory(outputPath);
-		} catch (IOException e) {
-			throw new ValidatorException("Failed to read output file/directory '" + outputPath + "'");
-		}
+        try {
+            outputResults = parseFileOrDirectory(outputPath);
+        } catch (IOException e) {
+            throw new ValidatorException("Failed to read output file/directory '" + outputPath + "'");
+        }
 
-		LongSet keys = new LongOpenHashSet(validationResults.keySet().size() + outputResults.keySet().size());
-		keys.addAll(validationResults.keySet());
-		keys.addAll(outputResults.keySet());
+        LongSet keys = new LongOpenHashSet(validationResults.keySet().size() + outputResults.keySet().size());
+        keys.addAll(validationResults.keySet());
+        keys.addAll(outputResults.keySet());
 
-		long errorsCount = 0;
+        long errorsCount = 0;
 
-		long missingVertices = 0;
-		long unknownVertices = 0;
-		long incorrectVertices = 0;
-		long correctVertices = 0;
+        long missingVertices = 0;
+        long unknownVertices = 0;
+        long incorrectVertices = 0;
+        long correctVertices = 0;
 
-		for (Long id: keys) {
+        for (Long id : keys) {
 
-			String error = null;
-			Long outputValue = outputResults.get(id);
-			Long correctValue = validationResults.get(id);
+            String error = null;
+            Long outputValue = outputResults.get(id);
+            Long correctValue = validationResults.get(id);
 
-			if (outputValue == null) {
-				missingVertices++;
-				error = "Vertex " + id + " is missing";
-			} else if (correctValue == null) {
-				unknownVertices++;
-				error = "Vertex " + id + " is not a valid vertex";
-			} else if (!rule.match(outputValue, correctValue)) {
-				incorrectVertices++;
-				error = "Vertex " + id + " has value '" + outputValue + "', but valid value is '" + correctValue + "'";
-			} else {
-				correctVertices++;
-			}
+            if (outputValue == null) {
+                missingVertices++;
+                error = "Vertex " + id + " is missing";
+            } else if (correctValue == null) {
+                unknownVertices++;
+                error = "Vertex " + id + " is not a valid vertex";
+            } else if (!rule.match(outputValue, correctValue)) {
+                incorrectVertices++;
+                error = "Vertex " + id + " has value '" + outputValue + "', but valid value is '" + correctValue + "'";
+            } else {
+                correctVertices++;
+            }
 
-			if (error != null) {
-				if (verbose && errorsCount < MAX_PRINT_ERROR_COUNT) {
-					LOG.info(" - " + error);
-				}
+            if (error != null) {
+                if (verbose && errorsCount < MAX_PRINT_ERROR_COUNT) {
+                    LOG.info(" - " + error);
+                }
 
-				errorsCount++;
-			}
-		}
+                errorsCount++;
+            }
+        }
 
-		if (errorsCount >= MAX_PRINT_ERROR_COUNT) {
-			LOG.info(" - [" + (errorsCount - MAX_PRINT_ERROR_COUNT) + " errors have been omitted] ");
-		}
+        if (errorsCount >= MAX_PRINT_ERROR_COUNT) {
+            LOG.info(" - [" + (errorsCount - MAX_PRINT_ERROR_COUNT) + " errors have been omitted] ");
+        }
 
-		if (errorsCount > 0) {
-			LOG.info("Validation failed.");
+        if (errorsCount > 0) {
+            LOG.info("Validation failed.");
 
-			long totalVertices = correctVertices + incorrectVertices + missingVertices;
+            long totalVertices = correctVertices + incorrectVertices + missingVertices;
 
-			LOG.info(String.format(" - Correct vertices: %d (%.2f%%)",
-					correctVertices, (100.0 * correctVertices) / totalVertices));
-			LOG.info(String.format(" - Incorrect vertices: %d (%.2f%%)",
-					incorrectVertices, (100.0 * incorrectVertices) / totalVertices));
-			LOG.info(String.format(" - Missing vertices: %d (%.2f%%)",
-					missingVertices, (100.0 * missingVertices) / totalVertices));
-			LOG.info(String.format(" - Unknown vertices: %d (%.2f%%)",
-					unknownVertices, (100.0 * unknownVertices) / totalVertices));
-		} else {
-			LOG.info("Validation is successful.");
-		}
+            LOG.info(String.format(" - Correct vertices: %d (%.2f%%)",
+                    correctVertices, (100.0 * correctVertices) / totalVertices));
+            LOG.info(String.format(" - Incorrect vertices: %d (%.2f%%)",
+                    incorrectVertices, (100.0 * incorrectVertices) / totalVertices));
+            LOG.info(String.format(" - Missing vertices: %d (%.2f%%)",
+                    missingVertices, (100.0 * missingVertices) / totalVertices));
+            LOG.info(String.format(" - Unknown vertices: %d (%.2f%%)",
+                    unknownVertices, (100.0 * unknownVertices) / totalVertices));
+        } else {
+            LOG.info("Validation is successful.");
+        }
 
-		LOG.info(MemoryUtil.getMemoryStats());
+        LOG.info(MemoryUtil.getMemoryStats());
 
-		return errorsCount == 0;
-	}
+        return errorsCount == 0;
+    }
 
-	private Long2LongMap parseFileOrDirectory(Path filePath) throws IOException {
+    private Long2LongMap parseFileOrDirectory(Path filePath) throws IOException {
 
-		LOG.info(String.format("Parsing file/directory %s.", filePath));
+        LOG.info(String.format("Parsing file/directory %s.", filePath));
 
-		final Long2LongMap results = new Long2LongOpenHashMap();
-		final AtomicLong counter = new AtomicLong(0);
+        final Long2LongMap results = new Long2LongOpenHashMap();
+        final AtomicLong counter = new AtomicLong(0);
 
-		Files.walkFileTree(filePath, new SimpleFileVisitor<Path>() {
-			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        Files.walkFileTree(filePath, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
-				try(BufferedReader reader = new BufferedReader(new FileReader(file.toFile()))) {
-					String line;
-					while ((line = reader.readLine()) != null) {
-						line = line.trim();
+                try (BufferedReader reader = new BufferedReader(new FileReader(file.toFile()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        line = line.trim();
 
-						if (line.isEmpty()) {
-							continue;
-						}
+                        if (line.isEmpty()) {
+                            continue;
+                        }
 
-						String[] parts = line.split("\\s+", 2);
-						try {
-							Long vertexId = Long.parseLong(parts[0]);
-							Long vertexValue = rule.parse(parts.length > 1 ? parts[1] : "");
-							results.put(vertexId,  vertexValue);
-							if(counter.incrementAndGet() % 100000000 == 0) {
-								LOG.debug(String.format("Parsed %s lines from %s.", counter.get(), file.getFileName().toString()));
-								LOG.debug(MemoryUtil.getMemoryStats());
-							}
-						} catch(Throwable e) {
-							LOG.error("Skipped invalid line '" + line + "' of file '" + file.getFileName().toString() + "'");
-						}
-					}
-					LOG.info(String.format("Parsed %s lines from %s.", results.size(), file.getFileName().toString()));
-				}
-				return FileVisitResult.CONTINUE;
-			}
-		});
-		return results;
-	}
+                        String[] parts = line.split("\\s+", 2);
+                        try {
+                            Long vertexId = Long.parseLong(parts[0]);
+                            Long vertexValue = rule.parse(parts.length > 1 ? parts[1] : "");
+                            results.put(vertexId, vertexValue);
+                            if (counter.incrementAndGet() % 100000000 == 0) {
+                                LOG.debug(String.format("Parsed %s lines from %s.", counter.get(), file.getFileName().toString()));
+                                LOG.debug(MemoryUtil.getMemoryStats());
+                            }
+                        } catch (Throwable e) {
+                            LOG.error("Skipped invalid line '" + line + "' of file '" + file.getFileName().toString() + "'");
+                        }
+                    }
+                    LOG.info(String.format("Parsed %s lines from %s.", results.size(), file.getFileName().toString()));
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return results;
+    }
 }

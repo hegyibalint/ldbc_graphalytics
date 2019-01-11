@@ -22,20 +22,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import science.atlarge.graphalytics.configuration.ConfigurationUtil;
 import science.atlarge.graphalytics.configuration.GraphalyticsExecutionException;
-import science.atlarge.graphalytics.execution.BenchmarkRunStatus;
-import science.atlarge.graphalytics.execution.RunnerService;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static java.nio.file.Files.readAllBytes;
-import static java.nio.file.Paths.get;
 
 /**
  * @author Wing Lung Ngai
@@ -55,7 +48,7 @@ public class ProcessUtil {
 
             List<String> command = new ArrayList<>();
             command.add(jvm);
-            command.add("-Xmx"+ setMaxMemory());
+            command.add("-Xmx" + setMaxMemory());
             command.add(mainClass.getCanonicalName());
             command.addAll(args);
 
@@ -92,7 +85,7 @@ public class ProcessUtil {
         }
     }
 
-    public static void monitorProcess(Process process, String runId)  {
+    public static void monitorProcess(Process process, String runId) {
 
         final String rId = runId;
         final Process runnerProcess = process;
@@ -106,7 +99,7 @@ public class ProcessUtil {
 
                 try {
                     while ((line = br.readLine()) != null) {
-                        LOG.debug("[Runner "+rId+"] => " + line);
+                        LOG.debug("[Runner " + rId + "] => " + line);
 
                     }
                 } catch (IOException e) {
@@ -138,7 +131,7 @@ public class ProcessUtil {
         try {
             Process process = runtime.exec("kill -0 " + processId);
             process.waitFor();
-            isAlive =  process.exitValue() == 0;
+            isAlive = process.exitValue() == 0;
         } catch (Exception e) {
             LOG.error("Failed to determine if a process is alive.");
             throw new GraphalyticsExecutionException("Benchmark is aborted.", e);
@@ -159,6 +152,7 @@ public class ProcessUtil {
      * Use the configured value if possible, otherwise use 3x the benchmark suite value.
      * By default, the maximum memory of the benchmark suite is set by "MaxHeapSize",
      * roughly equals to 1 / 4 of available memory in Linux systems.
+     *
      * @return maximum memory size
      */
     private static String setMaxMemory() {

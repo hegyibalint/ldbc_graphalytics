@@ -18,17 +18,19 @@
 package science.atlarge.graphalytics.domain.benchmark;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import science.atlarge.graphalytics.configuration.ConfigurationUtil;
 import science.atlarge.graphalytics.domain.algorithms.Algorithm;
 import science.atlarge.graphalytics.domain.algorithms.AlgorithmParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
 import science.atlarge.graphalytics.domain.graph.StandardGraph;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Wing Lung Ngai
@@ -55,7 +57,6 @@ public class TestBenchmark extends Benchmark {
         this.timeout = ConfigurationUtil.getInteger(benchmarkConfiguration, BENCHMARK_RUN_TIMEOUT_KEY);
 
     }
-
 
 
     public void setup() {
@@ -105,7 +106,7 @@ public class TestBenchmark extends Benchmark {
                 Graph graphSet = foundGraphs.get(graph.fileName);
 
 
-                if(!verifyGraphInfo(graph, graphSet)) {
+                if (!verifyGraphInfo(graph, graphSet)) {
                     throw new IllegalStateException(
                             String.format("Benchmark failed: graph info does not match expectation: ", graph.fileName));
                 }

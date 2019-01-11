@@ -26,28 +26,28 @@ package science.atlarge.graphalytics.domain.graph;
  */
 public enum PropertyType {
 
-	/**
-	 * Property is an integral number in the range [-2^63, 2^63 - 1].
-	 */
-	INTEGER,
-	/**
-	 * Property is a real number.
-	 */
-	REAL;
+    /**
+     * Property is an integral number in the range [-2^63, 2^63 - 1].
+     */
+    INTEGER,
+    /**
+     * Property is a real number.
+     */
+    REAL;
 
-	/**
-	 * @param propertyString a string representation of a PropertyType
-	 * @return the corresponding PropertyType value, or null if the propertyString does not match any value
-	 */
-	public static PropertyType fromString(String propertyString) {
-		switch (propertyString.toLowerCase()) {
-			case "int":
-			case "integer":
-				return INTEGER;
-			case "real":
-				return REAL;
-		}
-		return null;
-	}
+    /**
+     * @param propertyString a string representation of a PropertyType
+     * @return the corresponding PropertyType value, or null if the propertyString does not match any value
+     */
+    public static PropertyType fromString(String propertyString) {
+        switch (propertyString.toLowerCase()) {
+            case "int":
+            case "integer":
+                return INTEGER;
+            case "real":
+                return REAL;
+        }
+        return null;
+    }
 
 }

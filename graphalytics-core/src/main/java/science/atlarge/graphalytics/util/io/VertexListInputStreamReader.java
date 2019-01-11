@@ -32,59 +32,59 @@ import java.util.NoSuchElementException;
  */
 public class VertexListInputStreamReader implements VertexListStream {
 
-	private final BufferedReader reader;
-	private final VertexData cache = new VertexData();
-	private boolean cacheValid;
+    private final BufferedReader reader;
+    private final VertexData cache = new VertexData();
+    private boolean cacheValid;
 
-	public VertexListInputStreamReader(InputStream inputStream) {
-		 reader = new BufferedReader(new InputStreamReader(inputStream));
-	}
+    public VertexListInputStreamReader(InputStream inputStream) {
+        reader = new BufferedReader(new InputStreamReader(inputStream));
+    }
 
-	@Override
-	public boolean hasNextVertex() throws IOException {
-		if (cacheValid) {
-			return true;
-		} else {
-			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-				line = line.trim();
-				if (line.isEmpty()) {
-					continue;
-				}
+    @Override
+    public boolean hasNextVertex() throws IOException {
+        if (cacheValid) {
+            return true;
+        } else {
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                line = line.trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
 
-				String[] tokens = line.split(" ");
+                String[] tokens = line.split(" ");
 
-				try {
-					cache.setId(Long.parseLong(tokens[0]));
-				} catch (NumberFormatException ex) {
-					throw new IOException("Failed to parse vertex identifier from stream.", ex);
-				}
+                try {
+                    cache.setId(Long.parseLong(tokens[0]));
+                } catch (NumberFormatException ex) {
+                    throw new IOException("Failed to parse vertex identifier from stream.", ex);
+                }
 
-				if (cache.getValues().length == tokens.length - 1) {
-					System.arraycopy(tokens, 1, cache.getValues(), 0, tokens.length - 1);
-				} else {
-					cache.setValues(Arrays.copyOfRange(tokens, 1, tokens.length));
-				}
+                if (cache.getValues().length == tokens.length - 1) {
+                    System.arraycopy(tokens, 1, cache.getValues(), 0, tokens.length - 1);
+                } else {
+                    cache.setValues(Arrays.copyOfRange(tokens, 1, tokens.length));
+                }
 
-				cacheValid = true;
-				return true;
-			}
-			return false;
-		}
-	}
+                cacheValid = true;
+                return true;
+            }
+            return false;
+        }
+    }
 
-	@Override
-	public VertexData getNextVertex() throws IOException {
-		if (!hasNextVertex()) {
-			throw new NoSuchElementException();
-		}
+    @Override
+    public VertexData getNextVertex() throws IOException {
+        if (!hasNextVertex()) {
+            throw new NoSuchElementException();
+        }
 
-		cacheValid = false;
-		return cache;
-	}
+        cacheValid = false;
+        return cache;
+    }
 
-	@Override
-	public void close() throws IOException {
-		reader.close();
-	}
+    @Override
+    public void close() throws IOException {
+        reader.close();
+    }
 
 }

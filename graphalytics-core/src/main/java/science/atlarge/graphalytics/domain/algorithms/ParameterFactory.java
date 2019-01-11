@@ -17,8 +17,8 @@
  */
 package science.atlarge.graphalytics.domain.algorithms;
 
-import science.atlarge.graphalytics.configuration.InvalidConfigurationException;
 import org.apache.commons.configuration.Configuration;
+import science.atlarge.graphalytics.configuration.InvalidConfigurationException;
 
 /**
  * Factory interface that defines an API to parse algorithm-specific parameters from a Configuration.
@@ -29,13 +29,13 @@ import org.apache.commons.configuration.Configuration;
  */
 public interface ParameterFactory<T extends AlgorithmParameters> {
 
-	/**
-	 * Parses an object of type T from the properties of a Configuration object.
-	 *
-	 * @param configuration the Configuration describing the object of type T
-	 * @return the parsed object
-	 * @throws InvalidConfigurationException iff the configuration does not contain the required properties
-	 */
-	T fromConfiguration(Configuration configuration) throws InvalidConfigurationException;
+    /**
+     * Parses an object of type T from the properties of a Configuration object.
+     *
+     * @param configuration the Configuration describing the object of type T
+     * @return the parsed object
+     * @throws InvalidConfigurationException iff the configuration does not contain the required properties
+     */
+    T fromConfiguration(Configuration configuration) throws InvalidConfigurationException;
 
 }

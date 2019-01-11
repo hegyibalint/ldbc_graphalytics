@@ -28,21 +28,21 @@ import org.apache.commons.configuration.Configuration;
  */
 public final class EmptyParameters extends AlgorithmParameters {
 
-	public static final class EmptyParametersFactory implements ParameterFactory<EmptyParameters> {
+    public static final class EmptyParametersFactory implements ParameterFactory<EmptyParameters> {
 
-		@Override
-		public EmptyParameters fromConfiguration(Configuration configuration) {
-			return new EmptyParameters();
-		}
+        @Override
+        public EmptyParameters fromConfiguration(Configuration configuration) {
+            return new EmptyParameters();
+        }
 
-	}
+    }
 
-	@Override
-	public String toString() {
-		return String.format("[%s]", getDescription());
-	}
+    @Override
+    public String toString() {
+        return String.format("[%s]", getDescription());
+    }
 
-	public String getDescription() {
-		return String.format("none");
-	}
+    public String getDescription() {
+        return String.format("none");
+    }
 }

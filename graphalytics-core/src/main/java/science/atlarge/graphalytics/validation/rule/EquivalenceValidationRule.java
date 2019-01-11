@@ -27,35 +27,35 @@ import java.util.Map;
  * @author Wing Lung Ngai
  */
 public class EquivalenceValidationRule implements ValidationRule<Long> {
-	private Map<Long, Long> leftMap;
-	private Map<Long, Long> rightMap;
-	private long counter;
+    private Map<Long, Long> leftMap;
+    private Map<Long, Long> rightMap;
+    private long counter;
 
-	public EquivalenceValidationRule() {
-		leftMap = new HashMap<Long, Long>();
-		rightMap = new HashMap<Long, Long>();
-		counter = 0;
-	}
+    public EquivalenceValidationRule() {
+        leftMap = new HashMap<Long, Long>();
+        rightMap = new HashMap<Long, Long>();
+        counter = 0;
+    }
 
-	@Override
-	public Long parse(String val) throws NumberFormatException {
-		return Long.parseLong(val);
-	}
+    @Override
+    public Long parse(String val) throws NumberFormatException {
+        return Long.parseLong(val);
+    }
 
-	@Override
-	public boolean match(Long left, Long right) {
-		Long a = leftMap.get(left);
-		Long b = rightMap.get(right);
+    @Override
+    public boolean match(Long left, Long right) {
+        Long a = leftMap.get(left);
+        Long b = rightMap.get(right);
 
-		// If a and b are both null then we have not seen these labels
-		// before. Unify the labels by mapping them to the same value.
-		if (a == null && b == null) {
-			leftMap.put(left, counter);
-			rightMap.put(right, counter);
-			counter++;
-			return true;
-		}
+        // If a and b are both null then we have not seen these labels
+        // before. Unify the labels by mapping them to the same value.
+        if (a == null && b == null) {
+            leftMap.put(left, counter);
+            rightMap.put(right, counter);
+            counter++;
+            return true;
+        }
 
-		return a != null && b != null & a.equals(b);
-	}
+        return a != null && b != null & a.equals(b);
+    }
 }

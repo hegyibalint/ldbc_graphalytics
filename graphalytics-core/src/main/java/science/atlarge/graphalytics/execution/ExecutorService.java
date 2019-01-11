@@ -23,10 +23,10 @@ import akka.actor.Props;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValueFactory;
 import org.apache.commons.configuration.Configuration;
-import science.atlarge.graphalytics.configuration.ConfigurationUtil;
-import science.atlarge.graphalytics.report.result.BenchmarkRunResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import science.atlarge.graphalytics.configuration.ConfigurationUtil;
+import science.atlarge.graphalytics.report.result.BenchmarkRunResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,31 +67,32 @@ public class ExecutorService extends MircoService {
     @Override
     public void onReceive(Object message) throws Exception {
 
-        if(message instanceof Notification) {
+        if (message instanceof Notification) {
 
             Notification notification = (Notification) message;
             BenchmarkRunStatus runnerStatus = runnerStatuses.get(notification.getBenchmarkId());
             runnerStatus.setActor(this.sender());
 
-            if(!runnerStatus.isTerminated) {
-                if(notification.getLabel() == Notification.Label.REGISTRATION) {
-                    runnerStatus.setInitialized(true);;
-                } else if(notification.getLabel() == Notification.Label.EXECUTION) {
+            if (!runnerStatus.isTerminated) {
+                if (notification.getLabel() == Notification.Label.REGISTRATION) {
+                    runnerStatus.setInitialized(true);
+                    ;
+                } else if (notification.getLabel() == Notification.Label.EXECUTION) {
                     runnerStatus.setRunned(true);
-                } else if(notification.getLabel() == Notification.Label.VALIDATION) {
+                } else if (notification.getLabel() == Notification.Label.VALIDATION) {
                     runnerStatus.setValidated(true);
-                } else if(notification.getLabel() == Notification.Label.FAILURE) {
+                } else if (notification.getLabel() == Notification.Label.FAILURE) {
                     runnerStatus.addFailure((BenchmarkFailure) ((Notification) message).getPayload());
                     LOG.error("A benchmark failure (" + ((Notification) message).getPayload() + ") is caught by the runner.");
                 }
             }
 
-        } else if(message instanceof BenchmarkRunResult) {
+        } else if (message instanceof BenchmarkRunResult) {
             BenchmarkRunResult result = (BenchmarkRunResult) message;
 
             BenchmarkRunStatus runnerStatus = runnerStatuses.get(result.getBenchmarkRun().getId());
 
-            if(!runnerStatus.isTerminated) {
+            if (!runnerStatus.isTerminated) {
                 runnerStatus.setFinalized(true);
                 runnerStatus.setBenchmarkRunResult(result);
             }

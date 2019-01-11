@@ -17,9 +17,9 @@
  */
 package science.atlarge.graphalytics.domain.algorithms;
 
+import org.apache.commons.configuration.Configuration;
 import science.atlarge.graphalytics.configuration.ConfigurationUtil;
 import science.atlarge.graphalytics.configuration.InvalidConfigurationException;
-import org.apache.commons.configuration.Configuration;
 
 /**
  * Parameters for the execution of the breadth first search algorithm.
@@ -29,41 +29,41 @@ import org.apache.commons.configuration.Configuration;
  * @author Wing Lung Ngai
  */
 public final class BreadthFirstSearchParameters extends AlgorithmParameters {
-	private final long sourceVertex;
+    private final long sourceVertex;
 
-	/**
-	 * @param sourceVertex the source of the breadth first search
-	 */
-	public BreadthFirstSearchParameters(long sourceVertex) {
-		this.sourceVertex = sourceVertex;
-	}
+    /**
+     * @param sourceVertex the source of the breadth first search
+     */
+    public BreadthFirstSearchParameters(long sourceVertex) {
+        this.sourceVertex = sourceVertex;
+    }
 
-	/**
-	 * @return the source of the breadth first search
-	 */
-	public long getSourceVertex() {
-		return sourceVertex;
-	}
+    /**
+     * @return the source of the breadth first search
+     */
+    public long getSourceVertex() {
+        return sourceVertex;
+    }
 
-	/**
-	 * Factory for parsing a BreadthFirstSearchParameters object from the properties of a Configuration object.
-	 */
-	public static final class BreadthFirstSearchParametersFactory implements
-			ParameterFactory<BreadthFirstSearchParameters> {
-		@Override
-		public BreadthFirstSearchParameters fromConfiguration(Configuration configuration)
-				throws InvalidConfigurationException {
-			return new BreadthFirstSearchParameters(ConfigurationUtil.getLong(configuration, "source-vertex"));
-		}
-	}
+    /**
+     * Factory for parsing a BreadthFirstSearchParameters object from the properties of a Configuration object.
+     */
+    public static final class BreadthFirstSearchParametersFactory implements
+            ParameterFactory<BreadthFirstSearchParameters> {
+        @Override
+        public BreadthFirstSearchParameters fromConfiguration(Configuration configuration)
+                throws InvalidConfigurationException {
+            return new BreadthFirstSearchParameters(ConfigurationUtil.getLong(configuration, "source-vertex"));
+        }
+    }
 
-	@Override
-	public String toString() {
-		return String.format("BFS[%s]", getDescription());
-	}
+    @Override
+    public String toString() {
+        return String.format("BFS[%s]", getDescription());
+    }
 
-	public String getDescription() {
-		return String.format("src=%s", sourceVertex);
-	}
+    public String getDescription() {
+        return String.format("src=%s", sourceVertex);
+    }
 
 }

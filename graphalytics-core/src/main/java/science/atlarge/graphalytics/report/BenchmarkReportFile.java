@@ -30,13 +30,13 @@ import java.nio.file.Path;
  */
 public interface BenchmarkReportFile {
 
-	/**
-	 * Writes this single benchmark report file to a directory. This function may create directories when needed and
-	 * overwrite any previously existing file of the same name.
-	 *
-	 * @param reportPath the base directory to which the benchmark report is written
-	 * @throws IOException if an IO error occurred
-	 */
-	void write(Path reportPath) throws IOException;
+    /**
+     * Writes this single benchmark report file to a directory. This function may create directories when needed and
+     * overwrite any previously existing file of the same name.
+     *
+     * @param reportPath the base directory to which the benchmark report is written
+     * @throws IOException if an IO error occurred
+     */
+    void write(Path reportPath) throws IOException;
 
 }

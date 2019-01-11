@@ -20,7 +20,8 @@ package science.atlarge.graphalytics.report;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Container for BenchmarkReportFiles that describe the results of a benchmark suite execution. This class defines a
@@ -32,42 +33,42 @@ import java.util.*;
  */
 public class BenchmarkReport {
 
-	private final String reportTypeIdentifier;
-	private final Collection<BenchmarkReportFile> files;
+    private final String reportTypeIdentifier;
+    private final Collection<BenchmarkReportFile> files;
 
-	/**
-	 * @param reportTypeIdentifier an identifier for the output format (e.g. "html" or "csv")
-	 * @param files                a collection of files that define the contents of the benchmark report
-	 */
-	public BenchmarkReport(String reportTypeIdentifier, Collection<? extends BenchmarkReportFile> files) {
-		this.reportTypeIdentifier = reportTypeIdentifier;
-		this.files = new ArrayList<>(files);
-	}
+    /**
+     * @param reportTypeIdentifier an identifier for the output format (e.g. "html" or "csv")
+     * @param files                a collection of files that define the contents of the benchmark report
+     */
+    public BenchmarkReport(String reportTypeIdentifier, Collection<? extends BenchmarkReportFile> files) {
+        this.reportTypeIdentifier = reportTypeIdentifier;
+        this.files = new ArrayList<>(files);
+    }
 
-	/**
-	 * @param path a directory to write the report to, must be non-existent or an empty directory
-	 * @throws IOException if an exception occurred during writing, or if path already exists
-	 */
-	public void write(Path path) throws IOException {
-		// Ensure that the path does not yet exist, and create it, or that it is a directory
-		if (Files.exists(path)) {
-			if (!Files.isDirectory(path))
-				throw new IOException("Output path of report already exists: \"" + path + "\".");
-		} else {
-			Files.createDirectory(path);
-		}
+    /**
+     * @param path a directory to write the report to, must be non-existent or an empty directory
+     * @throws IOException if an exception occurred during writing, or if path already exists
+     */
+    public void write(Path path) throws IOException {
+        // Ensure that the path does not yet exist, and create it, or that it is a directory
+        if (Files.exists(path)) {
+            if (!Files.isDirectory(path))
+                throw new IOException("Output path of report already exists: \"" + path + "\".");
+        } else {
+            Files.createDirectory(path);
+        }
 
-		// Write the individual files
-		for (BenchmarkReportFile benchmarkReportFile : files) {
-			benchmarkReportFile.write(path);
-		}
-	}
+        // Write the individual files
+        for (BenchmarkReportFile benchmarkReportFile : files) {
+            benchmarkReportFile.write(path);
+        }
+    }
 
-	/**
-	 * @return an identifier for the output format (e.g. "html" or "csv")
-	 */
-	public String getReportTypeIdentifier() {
-		return reportTypeIdentifier;
-	}
+    /**
+     * @return an identifier for the output format (e.g. "html" or "csv")
+     */
+    public String getReportTypeIdentifier() {
+        return reportTypeIdentifier;
+    }
 
 }

@@ -26,12 +26,12 @@ package science.atlarge.graphalytics.configuration;
  */
 public class GraphalyticsExecutionException extends RuntimeException {
 
-	public GraphalyticsExecutionException(String message) {
-		super(message);
-	}
+    public GraphalyticsExecutionException(String message) {
+        super(message);
+    }
 
-	public GraphalyticsExecutionException(String message, Throwable throwable) {
-		super(message, throwable);
-	}
+    public GraphalyticsExecutionException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 
 }

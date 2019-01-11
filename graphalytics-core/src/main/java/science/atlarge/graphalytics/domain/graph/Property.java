@@ -27,57 +27,57 @@ import java.io.Serializable;
  */
 public final class Property implements Serializable {
 
-	private final String name;
-	private final PropertyType type;
+    private final String name;
+    private final PropertyType type;
 
-	/**
-	 * @param name the name of the property
-	 * @param type the type of the property
-	 */
-	public Property(String name, PropertyType type) {
-		this.name = name;
-		this.type = type;
-	}
+    /**
+     * @param name the name of the property
+     * @param type the type of the property
+     */
+    public Property(String name, PropertyType type) {
+        this.name = name;
+        this.type = type;
+    }
 
-	/**
-	 * @return the name of the property
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * @return the name of the property
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * @return the type of the property
-	 */
-	public PropertyType getType() {
-		return type;
-	}
+    /**
+     * @return the type of the property
+     */
+    public PropertyType getType() {
+        return type;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-		Property property = (Property)o;
+        Property property = (Property) o;
 
-		if (!name.equals(property.name)) return false;
-		return type == property.type;
+        if (!name.equals(property.name)) return false;
+        return type == property.type;
 
-	}
+    }
 
-	@Override
-	public int hashCode() {
-		int result = name.hashCode();
-		result = 31 * result + type.hashCode();
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + type.hashCode();
+        return result;
+    }
 
-	@Override
-	public String toString() {
-		return "Property{" +
-				"name='" + name + '\'' +
-				", type=" + type +
-				'}';
-	}
+    @Override
+    public String toString() {
+        return "Property{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                '}';
+    }
 
 }

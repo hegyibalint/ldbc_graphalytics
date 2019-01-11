@@ -17,9 +17,9 @@
  */
 package science.atlarge.graphalytics.domain.algorithms;
 
+import org.apache.commons.configuration.Configuration;
 import science.atlarge.graphalytics.configuration.ConfigurationUtil;
 import science.atlarge.graphalytics.configuration.InvalidConfigurationException;
-import org.apache.commons.configuration.Configuration;
 
 /**
  * Parameters for the execution of the community detection algorithm, based on label propagation.
@@ -29,40 +29,40 @@ import org.apache.commons.configuration.Configuration;
  * @author Wing Lung Ngai
  */
 public final class CommunityDetectionLPParameters extends AlgorithmParameters {
-	private final int maxIterations;
+    private final int maxIterations;
 
-	/**
-	 * @param maxIterations the maximum number of iterations of label propagation to execute
-	 */
-	public CommunityDetectionLPParameters(int maxIterations) {
-		this.maxIterations = maxIterations;
-	}
+    /**
+     * @param maxIterations the maximum number of iterations of label propagation to execute
+     */
+    public CommunityDetectionLPParameters(int maxIterations) {
+        this.maxIterations = maxIterations;
+    }
 
-	/**
-	 * @return the maximum number of iterations of label propagation to execute
-	 */
-	public int getMaxIterations() {
-		return maxIterations;
-	}
+    /**
+     * @return the maximum number of iterations of label propagation to execute
+     */
+    public int getMaxIterations() {
+        return maxIterations;
+    }
 
-	/**
-	 * Factory for parsing a CommunityDetectionLPParameters object from the properties of a Configuration object.
-	 */
-	public static final class CommunityDetectionLPParametersFactory implements
-			ParameterFactory<CommunityDetectionLPParameters> {
-		@Override
-		public CommunityDetectionLPParameters fromConfiguration(Configuration configuration)
-				throws InvalidConfigurationException {
-			return new CommunityDetectionLPParameters(ConfigurationUtil.getInteger(configuration, "max-iterations"));
-		}
-	}
+    /**
+     * Factory for parsing a CommunityDetectionLPParameters object from the properties of a Configuration object.
+     */
+    public static final class CommunityDetectionLPParametersFactory implements
+            ParameterFactory<CommunityDetectionLPParameters> {
+        @Override
+        public CommunityDetectionLPParameters fromConfiguration(Configuration configuration)
+                throws InvalidConfigurationException {
+            return new CommunityDetectionLPParameters(ConfigurationUtil.getInteger(configuration, "max-iterations"));
+        }
+    }
 
-	@Override
-	public String toString() {
-		return String.format("CDLP[%s]", getDescription());
-	}
+    @Override
+    public String toString() {
+        return String.format("CDLP[%s]", getDescription());
+    }
 
-	public String getDescription() {
-		return String.format("iter=%s",	maxIterations);
-	}
+    public String getDescription() {
+        return String.format("iter=%s", maxIterations);
+    }
 }

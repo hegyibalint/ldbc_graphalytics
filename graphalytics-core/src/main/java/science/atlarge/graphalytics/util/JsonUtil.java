@@ -54,7 +54,6 @@ public class JsonUtil {
     }
 
 
-
     public static class AnnotationExclusionStrategy implements ExclusionStrategy {
 
         @Override

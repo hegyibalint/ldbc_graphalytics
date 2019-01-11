@@ -27,36 +27,36 @@ import java.io.*;
  */
 public class EdgeListStreamWriter implements AutoCloseable {
 
-	private final EdgeListStream inputStream;
-	private final Writer outputWriter;
+    private final EdgeListStream inputStream;
+    private final Writer outputWriter;
 
-	public EdgeListStreamWriter(EdgeListStream inputStream, OutputStream outputStream) {
-		this.inputStream = inputStream;
-		this.outputWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
-	}
+    public EdgeListStreamWriter(EdgeListStream inputStream, OutputStream outputStream) {
+        this.inputStream = inputStream;
+        this.outputWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+    }
 
-	public void writeAll() throws IOException {
-		while (inputStream.hasNextEdge()) {
-			writeNextEdge();
-		}
-		outputWriter.flush();
-	}
+    public void writeAll() throws IOException {
+        while (inputStream.hasNextEdge()) {
+            writeNextEdge();
+        }
+        outputWriter.flush();
+    }
 
-	private void writeNextEdge() throws IOException {
-		EdgeListStream.EdgeData edgeData = inputStream.getNextEdge();
-		outputWriter.write(String.valueOf(edgeData.getSourceId()));
-		outputWriter.append(' ');
-		outputWriter.write(String.valueOf(edgeData.getDestinationId()));
-		for (String value : edgeData.getValues()) {
-			outputWriter.append(' ');
-			outputWriter.write(value);
-		}
-		outputWriter.append('\n');
-	}
+    private void writeNextEdge() throws IOException {
+        EdgeListStream.EdgeData edgeData = inputStream.getNextEdge();
+        outputWriter.write(String.valueOf(edgeData.getSourceId()));
+        outputWriter.append(' ');
+        outputWriter.write(String.valueOf(edgeData.getDestinationId()));
+        for (String value : edgeData.getValues()) {
+            outputWriter.append(' ');
+            outputWriter.write(value);
+        }
+        outputWriter.append('\n');
+    }
 
-	@Override
-	public void close() throws IOException {
-		outputWriter.close();
-	}
+    @Override
+    public void close() throws IOException {
+        outputWriter.close();
+    }
 
 }

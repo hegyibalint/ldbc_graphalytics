@@ -28,63 +28,63 @@ import java.util.Arrays;
  */
 public interface VertexListStream extends AutoCloseable {
 
-	/**
-	 * @return true iff there is another vertex available in the stream
-	 * @throws IOException if an error occurred while reading from or parsing the input stream
-	 */
-	boolean hasNextVertex() throws IOException;
+    /**
+     * @return true iff there is another vertex available in the stream
+     * @throws IOException if an error occurred while reading from or parsing the input stream
+     */
+    boolean hasNextVertex() throws IOException;
 
-	/**
-	 * Reads the next vertex from the stream. Warning: the returned VertexData object may be reused for the next call
-	 * to getNextVertex to significantly decrease garbage collection overhead. Throws a NoSuchElementException if no
-	 * next element exists.
-	 *
-	 * @return the next vertex
-	 * @throws IOException if an error occurred while reading from or parsing the input stream
-	 */
-	VertexData getNextVertex() throws IOException;
+    /**
+     * Reads the next vertex from the stream. Warning: the returned VertexData object may be reused for the next call
+     * to getNextVertex to significantly decrease garbage collection overhead. Throws a NoSuchElementException if no
+     * next element exists.
+     *
+     * @return the next vertex
+     * @throws IOException if an error occurred while reading from or parsing the input stream
+     */
+    VertexData getNextVertex() throws IOException;
 
-	@Override
-	void close() throws IOException;
+    @Override
+    void close() throws IOException;
 
-	class VertexData {
+    class VertexData {
 
-		private long id;
-		private String[] values;
+        private long id;
+        private String[] values;
 
-		public VertexData() {
-			this(0, new String[0]);
-		}
+        public VertexData() {
+            this(0, new String[0]);
+        }
 
-		public VertexData(long id, String[] values) {
-			this.id = id;
-			this.values = values;
-		}
+        public VertexData(long id, String[] values) {
+            this.id = id;
+            this.values = values;
+        }
 
-		public long getId() {
-			return id;
-		}
+        public long getId() {
+            return id;
+        }
 
-		protected void setId(long id) {
-			this.id = id;
-		}
+        protected void setId(long id) {
+            this.id = id;
+        }
 
-		public String[] getValues() {
-			return values;
-		}
+        public String[] getValues() {
+            return values;
+        }
 
-		protected void setValues(String[] values) {
-			this.values = values;
-		}
+        protected void setValues(String[] values) {
+            this.values = values;
+        }
 
-		@Override
-		public String toString() {
-			return "VertexData{" +
-					"id=" + id +
-					", values=" + Arrays.toString(values) +
-					'}';
-		}
+        @Override
+        public String toString() {
+            return "VertexData{" +
+                    "id=" + id +
+                    ", values=" + Arrays.toString(values) +
+                    '}';
+        }
 
-	}
+    }
 
 }

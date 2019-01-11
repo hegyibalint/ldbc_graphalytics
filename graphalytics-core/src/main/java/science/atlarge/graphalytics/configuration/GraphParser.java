@@ -17,13 +17,13 @@
  */
 package science.atlarge.graphalytics.configuration;
 
-import science.atlarge.graphalytics.domain.algorithms.Algorithm;
-import science.atlarge.graphalytics.domain.graph.Graph;
-import science.atlarge.graphalytics.domain.graph.FormattedGraph;
-import science.atlarge.graphalytics.domain.algorithms.AlgorithmParameters;
 import org.apache.commons.configuration.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import science.atlarge.graphalytics.domain.algorithms.Algorithm;
+import science.atlarge.graphalytics.domain.algorithms.AlgorithmParameters;
+import science.atlarge.graphalytics.domain.graph.FormattedGraph;
+import science.atlarge.graphalytics.domain.graph.Graph;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,76 +36,76 @@ import java.util.Map;
  */
 public final class GraphParser {
 
-	private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger();
 
-	private final Configuration config;
-	private final String name;
-	private final String graphRootDirectory;
-	private final String graphCacheDirectory;
+    private final Configuration config;
+    private final String name;
+    private final String graphRootDirectory;
+    private final String graphCacheDirectory;
 
-	private Graph graph = null;
-	private Map<Algorithm, AlgorithmParameters> algorithmParameters = null;
+    private Graph graph = null;
+    private Map<Algorithm, AlgorithmParameters> algorithmParameters = null;
 
-	public GraphParser(Configuration graphConfigurationSubset, String name, String graphRootDirectory,
-					   String graphCacheDirectory) {
-		this.config = graphConfigurationSubset;
-		this.name = name;
-		this.graphRootDirectory = graphRootDirectory;
-		this.graphCacheDirectory = graphCacheDirectory;
-	}
+    public GraphParser(Configuration graphConfigurationSubset, String name, String graphRootDirectory,
+                       String graphCacheDirectory) {
+        this.config = graphConfigurationSubset;
+        this.name = name;
+        this.graphRootDirectory = graphRootDirectory;
+        this.graphCacheDirectory = graphCacheDirectory;
+    }
 
-	public Graph parseGraph() throws InvalidConfigurationException {
-		if (graph != null) {
-			return graph;
-		}
+    public Graph parseGraph() throws InvalidConfigurationException {
+        if (graph != null) {
+            return graph;
+        }
 
-		parse();
-		return graph;
-	}
+        parse();
+        return graph;
+    }
 
-	public Map<Algorithm, AlgorithmParameters> parseAlgorithmParameters() throws InvalidConfigurationException {
-		if (algorithmParameters != null) {
-			return algorithmParameters;
-		}
+    public Map<Algorithm, AlgorithmParameters> parseAlgorithmParameters() throws InvalidConfigurationException {
+        if (algorithmParameters != null) {
+            return algorithmParameters;
+        }
 
-		parse();
-		return algorithmParameters;
-	}
+        parse();
+        return algorithmParameters;
+    }
 
-	private void parse() throws InvalidConfigurationException {
-		FormattedGraph sourceGraph = parseSourceGraph();
-		Graph.Builder builder = new Graph.Builder(name, sourceGraph, graphCacheDirectory);
-		algorithmParameters = parseAlgorithmConfiguration();
+    private void parse() throws InvalidConfigurationException {
+        FormattedGraph sourceGraph = parseSourceGraph();
+        Graph.Builder builder = new Graph.Builder(name, sourceGraph, graphCacheDirectory);
+        algorithmParameters = parseAlgorithmConfiguration();
 
-		for (Algorithm algorithm : algorithmParameters.keySet()) {
-			builder.withAlgorithm(algorithm, algorithmParameters.get(algorithm));
-		}
+        for (Algorithm algorithm : algorithmParameters.keySet()) {
+            builder.withAlgorithm(algorithm, algorithmParameters.get(algorithm));
+        }
 
-		graph = builder.toGraphSet();
-	}
+        graph = builder.toGraphSet();
+    }
 
-	private FormattedGraph parseSourceGraph() throws InvalidConfigurationException {
-		return new FormattedGraphParser(config, name, graphRootDirectory).parseFormattedGraph();
-	}
+    private FormattedGraph parseSourceGraph() throws InvalidConfigurationException {
+        return new FormattedGraphParser(config, name, graphRootDirectory).parseFormattedGraph();
+    }
 
-	private Map<Algorithm, AlgorithmParameters> parseAlgorithmConfiguration() throws InvalidConfigurationException {
-		Map<Algorithm, AlgorithmParameters> algorithmParameters = new HashMap<>();
+    private Map<Algorithm, AlgorithmParameters> parseAlgorithmConfiguration() throws InvalidConfigurationException {
+        Map<Algorithm, AlgorithmParameters> algorithmParameters = new HashMap<>();
 
-		// Get list of supported algorithms
-		String[] algorithmNames = ConfigurationUtil.getStringArray(config, "algorithms");
-		for (String algorithmName : algorithmNames) {
-			Algorithm algorithm = Algorithm.fromAcronym(algorithmName);
-			if (algorithm != null) {
-				AlgorithmParameters parameters = algorithm.getParameterFactory().fromConfiguration(
-						config.subset(algorithm.getAcronym().toLowerCase()));
-				algorithmParameters.put(algorithm, parameters);
-			} else {
-				LOG.warn("Found unknown algorithm name \"" + algorithmName + "\" for graph \"" +
-						name + "\".");
-			}
-		}
+        // Get list of supported algorithms
+        String[] algorithmNames = ConfigurationUtil.getStringArray(config, "algorithms");
+        for (String algorithmName : algorithmNames) {
+            Algorithm algorithm = Algorithm.fromAcronym(algorithmName);
+            if (algorithm != null) {
+                AlgorithmParameters parameters = algorithm.getParameterFactory().fromConfiguration(
+                        config.subset(algorithm.getAcronym().toLowerCase()));
+                algorithmParameters.put(algorithm, parameters);
+            } else {
+                LOG.warn("Found unknown algorithm name \"" + algorithmName + "\" for graph \"" +
+                        name + "\".");
+            }
+        }
 
-		return algorithmParameters;
-	}
+        return algorithmParameters;
+    }
 
 }

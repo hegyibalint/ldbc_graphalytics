@@ -21,6 +21,7 @@ import java.io.Serializable;
 
 /**
  * LoadedGraph represents graph data loaded into the system-dependent environment.
+ *
  * @author Wing Lung Ngai
  */
 public class LoadedGraph implements Serializable {

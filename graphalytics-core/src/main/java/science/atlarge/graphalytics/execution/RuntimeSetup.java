@@ -18,6 +18,7 @@
 package science.atlarge.graphalytics.execution;
 
 import science.atlarge.graphalytics.domain.graph.LoadedGraph;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,6 +26,7 @@ import java.io.Serializable;
 
 /**
  * The setup of the runtime configuraiton.
+ *
  * @author Wing Lung Ngai
  */
 public class RuntimeSetup implements Serializable {

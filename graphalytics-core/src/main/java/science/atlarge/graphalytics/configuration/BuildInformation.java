@@ -51,15 +51,16 @@ public class BuildInformation {
             try {
                 String text = properties.getProperty("build.graphalytics-core.verification");
                 verification = Boolean.parseBoolean(text);
-                if(text.equals("${maven.buildNumber.doCheck}")) {
+                if (text.equals("${maven.buildNumber.doCheck}")) {
                     verification = true;
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             stringBuilder.append(String.format("Name: %s (%s)\n", name, version));
             stringBuilder.append(String.format("Source: %s\n", link));
             stringBuilder.append(String.format("Build: branch %s, commit %s %s\n",
-                    branch, gitSha1.substring(0, 6), verification ? "": "(modification allowed!)"));
+                    branch, gitSha1.substring(0, 6), verification ? "" : "(modification allowed!)"));
             stringBuilder.append(String.format("Date: %s\n", TimeUtil.epoch2Date(timestamp)));
 
         } catch (Exception e) {
@@ -88,15 +89,16 @@ public class BuildInformation {
             try {
                 String text = properties.getProperty("build.platform.verification");
                 verification = Boolean.parseBoolean(text);
-                if(text.equals("${maven.buildNumber.doCheck}")) {
+                if (text.equals("${maven.buildNumber.doCheck}")) {
                     verification = true;
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             stringBuilder.append(String.format("Name: %s (%s)\n", name, version));
             stringBuilder.append(String.format("Source: %s\n", link));
             stringBuilder.append(String.format("Build: branch %s, commit %s %s\n",
-                    branch, gitSha1.substring(0, 6), verification ? "": "(modification allowed!)"));
+                    branch, gitSha1.substring(0, 6), verification ? "" : "(modification allowed!)"));
             stringBuilder.append(String.format("Date: %s\n", TimeUtil.epoch2Date(timestamp)));
 
         } catch (Exception e) {

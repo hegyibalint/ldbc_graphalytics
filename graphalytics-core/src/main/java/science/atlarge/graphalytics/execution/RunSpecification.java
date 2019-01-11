@@ -23,6 +23,7 @@ import java.io.Serializable;
 
 /**
  * The specification of the benchmark run.
+ *
  * @author Wing Lung Ngai
  */
 public class RunSpecification implements Serializable {

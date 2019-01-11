@@ -17,15 +17,15 @@
  */
 package science.atlarge.graphalytics.plugin;
 
-import science.atlarge.graphalytics.execution.RunSpecification;
-import science.atlarge.graphalytics.execution.Platform;
-import science.atlarge.graphalytics.domain.benchmark.Benchmark;
-import science.atlarge.graphalytics.report.result.BenchmarkResult;
-import science.atlarge.graphalytics.report.result.BenchmarkRunResult;
-import science.atlarge.graphalytics.report.BenchmarkReportGenerator;
-import science.atlarge.graphalytics.report.BenchmarkReportWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import science.atlarge.graphalytics.domain.benchmark.Benchmark;
+import science.atlarge.graphalytics.execution.Platform;
+import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.report.BenchmarkReportGenerator;
+import science.atlarge.graphalytics.report.BenchmarkReportWriter;
+import science.atlarge.graphalytics.report.result.BenchmarkResult;
+import science.atlarge.graphalytics.report.result.BenchmarkRunResult;
 
 import java.io.IOException;
 import java.net.URL;
@@ -37,92 +37,92 @@ import java.util.*;
  */
 public class Plugins implements Iterable<Plugin> {
 
-	private static Logger LOG = LogManager.getLogger();
+    private static Logger LOG = LogManager.getLogger();
 
-	private final List<Plugin> plugins;
+    private final List<Plugin> plugins;
 
-	public Plugins() {
-		plugins = new ArrayList<>();
-	}
+    public Plugins() {
+        plugins = new ArrayList<>();
+    }
 
-	public void addPlugin(Plugin plugin) {
-		plugins.add(plugin);
-	}
+    public void addPlugin(Plugin plugin) {
+        plugins.add(plugin);
+    }
 
-	public void preBenchmarkSuite(Benchmark benchmark) {
-		for (Plugin plugin : plugins) {
-			plugin.preBenchmarkSuite(benchmark);
-		}
-	}
+    public void preBenchmarkSuite(Benchmark benchmark) {
+        for (Plugin plugin : plugins) {
+            plugin.preBenchmarkSuite(benchmark);
+        }
+    }
 
-	public void prepare(RunSpecification runSpecification) {
-		for (Plugin plugin : plugins) {
-			plugin.prepare(runSpecification);
-		}
-	}
+    public void prepare(RunSpecification runSpecification) {
+        for (Plugin plugin : plugins) {
+            plugin.prepare(runSpecification);
+        }
+    }
 
-	public void terminate(RunSpecification runSpecification, BenchmarkRunResult benchmarkRunResult) {
-		for (Plugin plugin : plugins) {
-			plugin.terminate(runSpecification, benchmarkRunResult);
-		}
-	}
+    public void terminate(RunSpecification runSpecification, BenchmarkRunResult benchmarkRunResult) {
+        for (Plugin plugin : plugins) {
+            plugin.terminate(runSpecification, benchmarkRunResult);
+        }
+    }
 
-	public void postBenchmarkSuite(Benchmark benchmark, BenchmarkResult benchmarkResult) {
-		for (Plugin plugin : plugins) {
-			plugin.postBenchmarkSuite(benchmark, benchmarkResult);
-		}
-	}
+    public void postBenchmarkSuite(Benchmark benchmark, BenchmarkResult benchmarkResult) {
+        for (Plugin plugin : plugins) {
+            plugin.postBenchmarkSuite(benchmark, benchmarkResult);
+        }
+    }
 
-	public void shutdown() {
-		for (Plugin plugin : plugins) {
-			plugin.shutdown();
-		}
-	}
+    public void shutdown() {
+        for (Plugin plugin : plugins) {
+            plugin.shutdown();
+        }
+    }
 
-	public void preReportGeneration(BenchmarkReportGenerator reportGenerator) {
-		for (Plugin plugin : plugins) {
-			plugin.preReportGeneration(reportGenerator);
-		}
-	}
+    public void preReportGeneration(BenchmarkReportGenerator reportGenerator) {
+        for (Plugin plugin : plugins) {
+            plugin.preReportGeneration(reportGenerator);
+        }
+    }
 
-	@Override
-	public Iterator<Plugin> iterator() {
-		return plugins.iterator();
-	}
+    @Override
+    public Iterator<Plugin> iterator() {
+        return plugins.iterator();
+    }
 
-	public static Plugins discoverPluginsOnClasspath(Platform targetPlatform, Benchmark benchmark, BenchmarkReportWriter reportWriter) {
-		Plugins plugins = new Plugins();
+    public static Plugins discoverPluginsOnClasspath(Platform targetPlatform, Benchmark benchmark, BenchmarkReportWriter reportWriter) {
+        Plugins plugins = new Plugins();
 
-		try {
-			Enumeration<URL> resources = Plugins.class.getClassLoader().getResources("META-INF/graphalytics/plugins");
-			while (resources.hasMoreElements()) {
-				URL resource = resources.nextElement();
-				Plugin pluginInstance = instantiatePluginFromResource(resource, targetPlatform, benchmark, reportWriter);
-				if (pluginInstance != null) {
-					LOG.info("Loaded \"{}\" plugin:", pluginInstance.getPluginName());
-					LOG.debug("\t{}", pluginInstance.getPluginDescription());
-					plugins.addPlugin(pluginInstance);
-				}
-			}
-		} catch (IOException e) {
-			LOG.error("Failed to enumerate classpath resources while loading plugins.");
-		}
+        try {
+            Enumeration<URL> resources = Plugins.class.getClassLoader().getResources("META-INF/graphalytics/plugins");
+            while (resources.hasMoreElements()) {
+                URL resource = resources.nextElement();
+                Plugin pluginInstance = instantiatePluginFromResource(resource, targetPlatform, benchmark, reportWriter);
+                if (pluginInstance != null) {
+                    LOG.info("Loaded \"{}\" plugin:", pluginInstance.getPluginName());
+                    LOG.debug("\t{}", pluginInstance.getPluginDescription());
+                    plugins.addPlugin(pluginInstance);
+                }
+            }
+        } catch (IOException e) {
+            LOG.error("Failed to enumerate classpath resources while loading plugins.");
+        }
 
-		return plugins;
-	}
+        return plugins;
+    }
 
-	private static Plugin instantiatePluginFromResource(URL pluginSpecificationResource, Platform targetPlatform,
+    private static Plugin instantiatePluginFromResource(URL pluginSpecificationResource, Platform targetPlatform,
                                                         Benchmark benchmark, BenchmarkReportWriter reportWriter) {
-		try (Scanner pluginFileScanner = new Scanner(pluginSpecificationResource.openStream())) {
-			String pluginFactoryClassName = pluginFileScanner.next();
-			Class<? extends PluginFactory> pluginFactoryClass =
-					Class.forName(pluginFactoryClassName).asSubclass(PluginFactory.class);
-			PluginFactory pluginFactory = pluginFactoryClass.newInstance();
-			return pluginFactory.instantiatePlugin(targetPlatform, benchmark, reportWriter);
-		} catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			LOG.warn("Failed to load plugin \"" + pluginSpecificationResource.getFile() + "\":", e);
-			return null;
-		}
-	}
+        try (Scanner pluginFileScanner = new Scanner(pluginSpecificationResource.openStream())) {
+            String pluginFactoryClassName = pluginFileScanner.next();
+            Class<? extends PluginFactory> pluginFactoryClass =
+                    Class.forName(pluginFactoryClassName).asSubclass(PluginFactory.class);
+            PluginFactory pluginFactory = pluginFactoryClass.newInstance();
+            return pluginFactory.instantiatePlugin(targetPlatform, benchmark, reportWriter);
+        } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            LOG.warn("Failed to load plugin \"" + pluginSpecificationResource.getFile() + "\":", e);
+            return null;
+        }
+    }
 
 }

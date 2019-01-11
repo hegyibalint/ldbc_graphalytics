@@ -23,7 +23,9 @@ import java.io.Serializable;
  * @author Wing Lung Ngai
  */
 public class Notification implements Serializable {
-    public enum Label {REGISTRATION, EXECUTION, VALIDATION, FAILURE};
+    public enum Label {REGISTRATION, EXECUTION, VALIDATION, FAILURE}
+
+    ;
 
     String benchmarkId;
     Object payload;

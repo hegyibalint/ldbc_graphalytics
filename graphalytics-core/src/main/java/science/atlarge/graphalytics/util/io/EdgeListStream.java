@@ -28,74 +28,74 @@ import java.util.Arrays;
  */
 public interface EdgeListStream extends AutoCloseable {
 
-	/**
-	 * @return true iff there is another edge available in the stream
-	 * @throws IOException if an error occurred while reading from or parsing the input stream
-	 */
-	boolean hasNextEdge() throws IOException;
+    /**
+     * @return true iff there is another edge available in the stream
+     * @throws IOException if an error occurred while reading from or parsing the input stream
+     */
+    boolean hasNextEdge() throws IOException;
 
-	/**
-	 * Reads the next edge from the stream. Warning: the returned EdgeData object may be reused for the next call
-	 * to getNextEdge to significantly decrease garbage collection overhead. Throws a NoSuchElementException if no
-	 * next element exists.
-	 *
-	 * @return the next edge
-	 * @throws IOException if an error occurred while reading from or parsing the input stream
-	 */
-	EdgeData getNextEdge() throws IOException;
+    /**
+     * Reads the next edge from the stream. Warning: the returned EdgeData object may be reused for the next call
+     * to getNextEdge to significantly decrease garbage collection overhead. Throws a NoSuchElementException if no
+     * next element exists.
+     *
+     * @return the next edge
+     * @throws IOException if an error occurred while reading from or parsing the input stream
+     */
+    EdgeData getNextEdge() throws IOException;
 
-	@Override
-	void close() throws IOException;
+    @Override
+    void close() throws IOException;
 
-	class EdgeData {
+    class EdgeData {
 
-		private long sourceId;
-		private long destinationId;
-		private String[] values;
+        private long sourceId;
+        private long destinationId;
+        private String[] values;
 
-		public EdgeData() {
-			this(0, 0, new String[0]);
-		}
+        public EdgeData() {
+            this(0, 0, new String[0]);
+        }
 
-		public EdgeData(long sourceId, long destinationId, String[] values) {
-			this.sourceId = sourceId;
-			this.destinationId = destinationId;
-			this.values = values;
-		}
+        public EdgeData(long sourceId, long destinationId, String[] values) {
+            this.sourceId = sourceId;
+            this.destinationId = destinationId;
+            this.values = values;
+        }
 
-		public long getSourceId() {
-			return sourceId;
-		}
+        public long getSourceId() {
+            return sourceId;
+        }
 
-		protected void setSourceId(long sourceId) {
-			this.sourceId = sourceId;
-		}
+        protected void setSourceId(long sourceId) {
+            this.sourceId = sourceId;
+        }
 
-		public long getDestinationId() {
-			return destinationId;
-		}
+        public long getDestinationId() {
+            return destinationId;
+        }
 
-		protected void setDestinationId(long destinationId) {
-			this.destinationId = destinationId;
-		}
+        protected void setDestinationId(long destinationId) {
+            this.destinationId = destinationId;
+        }
 
-		public String[] getValues() {
-			return values;
-		}
+        public String[] getValues() {
+            return values;
+        }
 
-		protected void setValues(String[] values) {
-			this.values = values;
-		}
+        protected void setValues(String[] values) {
+            this.values = values;
+        }
 
-		@Override
-		public String toString() {
-			return "EdgeData{" +
-					"sourceId=" + sourceId +
-					", destinationId=" + destinationId +
-					", values=" + Arrays.toString(values) +
-					'}';
-		}
+        @Override
+        public String toString() {
+            return "EdgeData{" +
+                    "sourceId=" + sourceId +
+                    ", destinationId=" + destinationId +
+                    ", values=" + Arrays.toString(values) +
+                    '}';
+        }
 
-	}
+    }
 
 }

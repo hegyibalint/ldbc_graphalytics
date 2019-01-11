@@ -17,17 +17,16 @@
  */
 package science.atlarge.graphalytics.domain.benchmark;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import science.atlarge.graphalytics.domain.algorithms.Algorithm;
 import science.atlarge.graphalytics.domain.algorithms.AlgorithmParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
 import science.atlarge.graphalytics.domain.graph.GraphScale;
 import science.atlarge.graphalytics.domain.graph.StandardGraph;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.math.RoundingMode;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -103,7 +102,7 @@ public class StandardBenchmark extends Benchmark {
                 Graph graph = foundGraphs.get(selectedGraph.fileName);
 
 
-                if(graph == null || !verifyGraphInfo(selectedGraph, graph)) {
+                if (graph == null || !verifyGraphInfo(selectedGraph, graph)) {
                     throw new IllegalStateException(
                             String.format("Benchmark failed: graph info does not match expectation: %s", selectedGraph.fileName));
                 }
@@ -122,8 +121,8 @@ public class StandardBenchmark extends Benchmark {
     public List<StandardGraph> selectGraph(GraphScale scale, Algorithm algorithm) {
         List<StandardGraph> selected = new ArrayList<>();
 
-        if(scale==GraphScale.S) {
-            if(algorithm != Algorithm.SSSP) {
+        if (scale == GraphScale.S) {
+            if (algorithm != Algorithm.SSSP) {
                 selected.add(StandardGraph.DOTA);
                 selected.add(StandardGraph.DG79FB);
                 selected.add(StandardGraph.DG77ZF);
@@ -219,7 +218,7 @@ public class StandardBenchmark extends Benchmark {
                 Graph graph = foundGraphs.get(selectedGraph.fileName);
 
 
-                if(!verifyGraphInfo(selectedGraph, graph)) {
+                if (!verifyGraphInfo(selectedGraph, graph)) {
                     throw new IllegalStateException(
                             String.format("Benchmark failed: graph info does not match expectation: ", selectedGraph.fileName));
                 }

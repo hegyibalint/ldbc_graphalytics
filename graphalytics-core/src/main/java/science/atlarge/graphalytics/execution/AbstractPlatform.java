@@ -28,5 +28,4 @@ package science.atlarge.graphalytics.execution;
 public abstract class AbstractPlatform implements Platform {
 
 
-
 }

@@ -27,11 +27,11 @@ import science.atlarge.graphalytics.validation.VertexValidator;
  * within a certain threshold of each other.
  *
  * @param <E> Type of the vertex value.
- *
  * @author Stijn Heldens
  * @author Wing Lung Ngai
  */
 public interface ValidationRule<E> {
-	public E parse(String val) throws Throwable;
-	public boolean match(E lhs, E rhs);
+    public E parse(String val) throws Throwable;
+
+    public boolean match(E lhs, E rhs);
 }

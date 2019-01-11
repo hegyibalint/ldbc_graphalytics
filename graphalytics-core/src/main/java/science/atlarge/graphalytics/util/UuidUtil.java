@@ -34,7 +34,7 @@ public class UuidUtil {
     public static String getRandomUUID() {
         String uuid = String.valueOf(UUID.randomUUID().getLeastSignificantBits() * -1l);
 
-        while(usedUUIDs.contains(uuid)) {
+        while (usedUUIDs.contains(uuid)) {
             uuid = String.valueOf(UUID.randomUUID().getLeastSignificantBits() * -1l);
         }
         usedUUIDs.add(uuid);
@@ -45,7 +45,7 @@ public class UuidUtil {
     public static String getRandomUUID(String prefix, int length) {
         String uuid = prefix + String.valueOf(getRandomUUID().substring(0, length));
 
-        while(usedUUIDs.contains(uuid)) {
+        while (usedUUIDs.contains(uuid)) {
             uuid = prefix + String.valueOf(getRandomUUID().substring(0, length));
         }
         usedUUIDs.add(uuid);

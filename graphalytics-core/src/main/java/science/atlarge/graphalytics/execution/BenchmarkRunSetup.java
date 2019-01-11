@@ -18,6 +18,7 @@
 package science.atlarge.graphalytics.execution;
 
 import science.atlarge.graphalytics.domain.benchmark.BenchmarkRun;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,6 +28,7 @@ import java.nio.file.Paths;
 
 /**
  * The setup of the benchmark run.
+ *
  * @author Wing Lung Ngai
  */
 public class BenchmarkRunSetup implements Serializable {
@@ -108,6 +110,6 @@ public class BenchmarkRunSetup implements Serializable {
         validationDir = Paths.get(((String) stream.readObject()));
 
         outputRequired = stream.readBoolean();
-        validationRequired =  stream.readBoolean();
+        validationRequired = stream.readBoolean();
     }
 }

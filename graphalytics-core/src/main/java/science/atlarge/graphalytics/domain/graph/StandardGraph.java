@@ -60,7 +60,6 @@ public enum StandardGraph {
     GR26("gr26", "graph500-26", "G26", false, false, false, 32804978, 1051922853);
 
 
-
     public String id;
     public String fileName;
     public String scale;

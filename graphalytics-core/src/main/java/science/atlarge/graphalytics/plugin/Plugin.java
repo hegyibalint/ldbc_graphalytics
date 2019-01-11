@@ -19,10 +19,10 @@ package science.atlarge.graphalytics.plugin;
 
 import science.atlarge.graphalytics.domain.benchmark.Benchmark;
 import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.report.BenchmarkReportGenerator;
 import science.atlarge.graphalytics.report.result.BenchmarkMetrics;
 import science.atlarge.graphalytics.report.result.BenchmarkResult;
 import science.atlarge.graphalytics.report.result.BenchmarkRunResult;
-import science.atlarge.graphalytics.report.BenchmarkReportGenerator;
 
 /**
  * @author Mihai Capotă
@@ -31,24 +31,24 @@ import science.atlarge.graphalytics.report.BenchmarkReportGenerator;
  */
 public interface Plugin {
 
-	void preBenchmarkSuite(Benchmark benchmark);
+    void preBenchmarkSuite(Benchmark benchmark);
 
-	void prepare(RunSpecification runSpecification);
+    void prepare(RunSpecification runSpecification);
 
-	void startup(RunSpecification runSpecification);
+    void startup(RunSpecification runSpecification);
 
-	BenchmarkMetrics finalize(RunSpecification runSpecification, BenchmarkMetrics metrics);
+    BenchmarkMetrics finalize(RunSpecification runSpecification, BenchmarkMetrics metrics);
 
-	void terminate(RunSpecification runSpecification, BenchmarkRunResult benchmarkRunResult);
+    void terminate(RunSpecification runSpecification, BenchmarkRunResult benchmarkRunResult);
 
-	void postBenchmarkSuite(Benchmark benchmark, BenchmarkResult benchmarkResult);
+    void postBenchmarkSuite(Benchmark benchmark, BenchmarkResult benchmarkResult);
 
-	void preReportGeneration(BenchmarkReportGenerator reportGenerator);
+    void preReportGeneration(BenchmarkReportGenerator reportGenerator);
 
-	void shutdown();
+    void shutdown();
 
-	String getPluginName();
+    String getPluginName();
 
-	String getPluginDescription();
+    String getPluginDescription();
 
 }

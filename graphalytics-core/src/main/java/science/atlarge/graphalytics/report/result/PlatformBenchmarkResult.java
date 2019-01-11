@@ -28,22 +28,22 @@ import java.io.Serializable;
  */
 public final class PlatformBenchmarkResult implements Serializable {
 
-	private boolean completeSuccessfully;
+    private boolean completeSuccessfully;
 
 
-	public PlatformBenchmarkResult() {
-	}
+    public PlatformBenchmarkResult() {
+    }
 
 
-	public PlatformBenchmarkResult(boolean completeSuccessfully) {
-		this.completeSuccessfully = completeSuccessfully;
-	}
+    public PlatformBenchmarkResult(boolean completeSuccessfully) {
+        this.completeSuccessfully = completeSuccessfully;
+    }
 
-	public boolean isCompleteSuccessfully() {
-		return completeSuccessfully;
-	}
+    public boolean isCompleteSuccessfully() {
+        return completeSuccessfully;
+    }
 
-	public void setCompleteSuccessfully(boolean completeSuccessfully) {
-		this.completeSuccessfully = completeSuccessfully;
-	}
+    public void setCompleteSuccessfully(boolean completeSuccessfully) {
+        this.completeSuccessfully = completeSuccessfully;
+    }
 }

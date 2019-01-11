@@ -26,12 +26,12 @@ package science.atlarge.graphalytics.execution;
  */
 public class PlatformExecutionException extends Exception {
 
-	public PlatformExecutionException(String message) {
-		super(message);
-	}
+    public PlatformExecutionException(String message) {
+        super(message);
+    }
 
-	public PlatformExecutionException(String message, Throwable throwable) {
-		super(message, throwable);
-	}
+    public PlatformExecutionException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 
 }

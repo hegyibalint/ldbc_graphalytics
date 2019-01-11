@@ -48,13 +48,14 @@ public class TimeUtil {
 
     /**
      * Continues if current time is larger than start time + wait time, otherwise wait for an interval.
+     *
      * @param startTime The timestamp when the waiting starts (in Epoch)
-     * @param waitTime The duration of the waiting (in seconds)
-     * @param interval The duration of the interval (in seconds).
+     * @param waitTime  The duration of the waiting (in seconds)
+     * @param interval  The duration of the interval (in seconds).
      * @return true if current time > start time + wait time, otherwise false.
      */
     public static boolean waitFor(long startTime, long waitTime, long interval) {
-        if(System.currentTimeMillis() - startTime > waitTime * 1000) {
+        if (System.currentTimeMillis() - startTime > waitTime * 1000) {
             return true;
         } else {
             TimeUtil.waitFor(interval);

@@ -212,6 +212,7 @@ public class ResultData {
             this.baseline = baseline;
             this.scalability = scalability;
         }
+
         String name;
         String baseline;
         String scalability;
@@ -237,7 +238,7 @@ public class ResultData {
         }
 
         public void addRun(String id, String timestamp, String success, String loadTime, String makespan, String processingTime, String archiveLink) {
-            runs.put(id, new Run(id, timestamp, success, loadTime,  makespan, processingTime, archiveLink));
+            runs.put(id, new Run(id, timestamp, success, loadTime, makespan, processingTime, archiveLink));
         }
     }
 

@@ -18,23 +18,23 @@
 package science.atlarge.graphalytics.execution;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import science.atlarge.graphalytics.configuration.GraphalyticsExecutionException;
+import science.atlarge.graphalytics.configuration.PlatformParser;
+import science.atlarge.graphalytics.domain.benchmark.BenchmarkRun;
 import science.atlarge.graphalytics.plugin.Plugins;
 import science.atlarge.graphalytics.report.result.BenchmarkMetric;
-import science.atlarge.graphalytics.util.LogUtil;
-import science.atlarge.graphalytics.configuration.PlatformParser;
 import science.atlarge.graphalytics.report.result.BenchmarkMetrics;
 import science.atlarge.graphalytics.report.result.BenchmarkRunResult;
-import science.atlarge.graphalytics.domain.benchmark.BenchmarkRun;
+import science.atlarge.graphalytics.util.LogUtil;
 import science.atlarge.graphalytics.util.ProcessUtil;
 import science.atlarge.graphalytics.util.TimeUtil;
 import science.atlarge.graphalytics.validation.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import science.atlarge.graphalytics.validation.rule.EpsilonValidationRule;
 import science.atlarge.graphalytics.validation.rule.ValidationRule;
 
-import java.io.*;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,289 +43,283 @@ import java.nio.file.Paths;
 import static java.nio.file.Files.readAllBytes;
 
 /**
- *
  * @author Wing Lung Ngai
  */
 public class BenchmarkRunner {
 
-	private static Logger LOG;
-
-	private RunnerService service;
-	private Plugins plugins;
-
-	Platform platform;
-	String benchmarkId;
-
-	BenchmarkStatus benchmarkStatus;
+    private static Logger LOG;
+    Platform platform;
+    String benchmarkId;
+    BenchmarkStatus benchmarkStatus;
+    private RunnerService service;
+    private Plugins plugins;
 
 
-	public static void main(String[] args) throws IOException {
-		// Get an instance of the platform integration code
+    public BenchmarkRunner() {
+        benchmarkStatus = new BenchmarkStatus();
+    }
+
+    public static void main(String[] args) throws IOException {
+        // Get an instance of the platform integration code
 
 
-		LogUtil.intializeLoggers();
-		LogUtil.appendSimplifiedConsoleLogger(Level.TRACE);
-		LOG = LogManager.getLogger();
+        LogUtil.intializeLoggers();
+        LogUtil.appendSimplifiedConsoleLogger(Level.TRACE);
+        LOG = LogManager.getLogger();
 
-		LOG.info("Initializing Benchmark Runner.");
+        LOG.info("Initializing Benchmark Runner.");
 
-		try {
-			BenchmarkRunner executor = new BenchmarkRunner();
-			registerRunnerProcessId(Paths.get(args[2]));
-			executor.platform = PlatformParser.loadPlatformFromCommandLineArgs();
-			executor.benchmarkId = args[1];
-			executor.setPlugins(Plugins.discoverPluginsOnClasspath(executor.getPlatform(), null, null));
+        try {
+            BenchmarkRunner executor = new BenchmarkRunner();
+            registerRunnerProcessId(Paths.get(args[2]));
+            executor.platform = PlatformParser.loadPlatformFromCommandLineArgs();
+            executor.benchmarkId = args[1];
+            executor.setPlugins(Plugins.discoverPluginsOnClasspath(executor.getPlatform(), null, null));
 
-			RunnerService.InitService(executor);
-		} catch (Exception e) {
-			LOG.error(e);
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
+            RunnerService.InitService(executor);
+        } catch (Exception e) {
+            LOG.error(e);
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
 
-	public BenchmarkRunner() {
-		benchmarkStatus = new BenchmarkStatus();
-	}
+    /**
+     * Terminate benchmark runner process.
+     */
+    public static void terminateRunner(BenchmarkRunStatus runnerInfo) {
 
-	public void startup(RunSpecification runSpecification) throws Exception {
-		platform.startup(runSpecification);
-	}
+        LOG = LogManager.getLogger();
+        LOG.debug(String.format("Terminating benchmark runner."));
+        Process process = runnerInfo.getProcess();
+        int port = RunnerService.getRunnerPort();
 
-	public BenchmarkMetrics finalize(RunSpecification runSpecification) throws Exception {
-		return platform.finalize(runSpecification);
-	}
+        // Check if the runner process is registered in the benchmark run log.
+        Integer processId = null;
+        try {
+            processId = retrieveRunnerProcessId(runnerInfo);
+            LOG.debug(String.format("Found runner process id %s", processId));
+        } catch (Exception e) {
+            LOG.error("Failed to find the process id for the runner process.");
+            throw new GraphalyticsExecutionException("Failed to find benchmark runner registration. Benchmark aborted.", e);
+        }
 
+        // First attempt to terminate runner process gracefully.
+        LOG.debug("Terminating runner process gracefully.");
+        ProcessUtil.terminateProcess(process);
 
-	public boolean run(RunSpecification runSpecification) {
-		boolean runned = false;
-		Platform platform = getPlatform();
+        boolean terminated = ProcessUtil.isNetworkPortAvailable(port) && !ProcessUtil.isProcessAlive(processId);
 
-		BenchmarkRun benchmarkRun = runSpecification.getBenchmarkRun();
+        LOG.debug(String.format("Runner process is %s: (process alive=%s, port available=%s)",
+                terminated ? "terminated" : "alive",
+                ProcessUtil.isProcessAlive(processId),
+                ProcessUtil.isNetworkPortAvailable(port)));
 
-		LOG.info(String.format("Runner executing benchmark %s.", benchmarkRun.getId()));
+        while (!terminated) {
+            LOG.warn("Terminating runner process forcibly.");
+            try {
+                ProcessUtil.terminateProcess(processId);
+            } catch (Exception e) {
+                LOG.error("Failed to terminated runner process.", e);
+            }
 
-		// Start the timer
-		benchmarkStatus.setStartOfBenchmark();
+            if (!terminated) {
+                LOG.error(String.format("Failed to kill runner process."));
+                TimeUtil.waitFor(10);
+            }
+            terminated = ProcessUtil.isNetworkPortAvailable(port) && !ProcessUtil.isProcessAlive(processId);
 
-		// Execute the benchmark and collect the result
-		try {
-			platform.run(runSpecification);
-			runned = true;
-		} catch(Exception ex) {
-			LOG.error("Algorithm \"" + benchmarkRun.getAlgorithm().getName() + "\" on graph \"" +
-					benchmarkRun.getFormattedGraph().getGraph().getName() + " failed to complete:", ex);
-		}
+            LOG.debug(String.format("Runner process is %s: (process alive=%s, port available=%s)",
+                    terminated ? "terminated" : "alive",
+                    ProcessUtil.isProcessAlive(processId),
+                    ProcessUtil.isNetworkPortAvailable(port)));
+        }
+    }
 
-		// Stop the timer
-		benchmarkStatus.setEndOfBenchmark();
+    /**
+     * Standard termination method for platform process when time-out occurs.
+     *
+     * @param runSpecification
+     */
+    public static void terminatePlatform(RunSpecification runSpecification) {
 
-		return runned;
-	}
+        LOG = LogManager.getLogger();
+        LOG.debug(String.format("Terminating platform process(es)."));
 
-	public boolean count(RunSpecification runSpecification) {
-		BenchmarkRunSetup benchmarkRunSetup = runSpecification.getBenchmarkRunSetup();
-		BenchmarkRun benchmarkRun = runSpecification.getBenchmarkRun();
+        BenchmarkRunSetup benchmarkRunSetup = runSpecification.getBenchmarkRunSetup();
 
-		if (benchmarkRunSetup.isValidationRequired()) {
-			try {
-				VertexCounter counter = new VertexCounter(benchmarkRunSetup.getOutputDir());
-				long expected = benchmarkRun.getGraph().getNumberOfVertices();
-				long parsed = counter.count();
-				if(parsed != expected) {
-					return false;
-				}
-			} catch (ValidatorException e) {
-				LOG.error("Failed to count the number of outputs: " + e);
-				return false;
-			}
-		}
-		return true;
-	}
+        Path pidFile = benchmarkRunSetup.getLogDir().resolve("platform").resolve("executable.pid");
+        if (pidFile.toFile().exists()) {
 
-	public boolean validate(RunSpecification runSpecification) {
-		BenchmarkRunSetup benchmarkRunSetup = runSpecification.getBenchmarkRunSetup();
-		BenchmarkRun benchmarkRun = runSpecification.getBenchmarkRun();
+            Integer processId = null;
+            try {
+                processId = Integer.parseInt((new String(readAllBytes(pidFile))).trim());
+                LOG.debug(String.format("Found platform process id " + processId));
+            } catch (Exception e) {
+                LOG.error(String.format("Failed to parse process id from executable.pid file.", e));
+                return;
+            }
 
-		boolean validated = true;
+            boolean terminated = !ProcessUtil.isProcessAlive(processId);
+            LOG.debug(String.format("Platform process %s is %s.", processId, terminated ? "terminated" : "alive"));
 
-		if (benchmarkRunSetup.isValidationRequired()) {
-			ValidationRule validationRule = benchmarkRun.getAlgorithm().getValidationRule();
+            while (!terminated) {
+                try {
+                    LOG.warn(String.format("Terminating platform process forcibly."));
+                    ProcessUtil.terminateProcess(processId);
+                    terminated = !ProcessUtil.isProcessAlive(processId);
 
-			@SuppressWarnings("rawtypes")
-			VertexValidator<?> validator;
-			if(validationRule instanceof EpsilonValidationRule) {
-				validator = new DoubleVertexValidator(benchmarkRunSetup.getOutputDir(),
-						benchmarkRunSetup.getValidationDir(),
-						validationRule, true);
-			} else {
-				validator = new LongVertexValidator(benchmarkRunSetup.getOutputDir(),
-						benchmarkRunSetup.getValidationDir(),
-						validationRule, true);
-			}
+                    if (!terminated) {
+                        LOG.error(String.format("Failed to kill platform process."));
+                        TimeUtil.waitFor(10);
+                    }
+                } catch (Exception e) {
+                    LOG.error(String.format("Failed to kill platform process."), e);
+                }
+            }
+        } else {
+            LOG.error("Failed to find the executable.pid file for platform process.");
+        }
+    }
 
-			try {
-				validated = validator.validate();
-			} catch (ValidatorException e) {
-				LOG.error("Failed to validate output: " + e);
-				validated = false;
-			}
-		}
+    public static void registerRunnerProcessId(Path logDir) throws Exception {
+        Path pidFile = logDir.resolve("platform").resolve("runner.pid");
+        pidFile.toFile().getParentFile().mkdirs();
+        pidFile.toFile().createNewFile();
+        Files.write(pidFile, String.valueOf(ProcessUtil.getProcessId()).getBytes());
+    }
 
-		benchmarkStatus.setValidated(validated);
-		return validated;
-	}
+    public static int retrieveRunnerProcessId(BenchmarkRunStatus runnerInfo) throws Exception {
+        Path pidFile = runnerInfo.getRunSpecification().getBenchmarkRunSetup().getLogDir().resolve("platform").resolve("runner.pid");
+        String content = new String(readAllBytes(pidFile));
+        return Integer.parseInt(content);
+    }
 
-	public BenchmarkRunResult summarize(BenchmarkRun benchmarkRun, BenchmarkMetrics metrics) {
+    public void startup(RunSpecification runSpecification) throws Exception {
+        platform.startup(runSpecification);
+    }
 
-		// calculate makespan
-		long makespanMS = (benchmarkStatus.getEndOfBenchmark().getTime() - benchmarkStatus.getStartOfBenchmark().getTime());
-		BigDecimal makespanS = (new BigDecimal(makespanMS)).divide(new BigDecimal(1000), 3, BigDecimal.ROUND_CEILING);
-		metrics.setMakespan(new BenchmarkMetric(makespanS, "s"));
+    public BenchmarkMetrics finalize(RunSpecification runSpecification) throws Exception {
+        return platform.finalize(runSpecification);
+    }
 
-		BenchmarkRunResult benchmarkRunResult =
-				new BenchmarkRunResult(benchmarkRun, benchmarkStatus, new BenchmarkFailures(), metrics);
+    public boolean run(RunSpecification runSpecification) {
+        boolean runned = false;
+        Platform platform = getPlatform();
 
-		return benchmarkRunResult;
-	}
+        BenchmarkRun benchmarkRun = runSpecification.getBenchmarkRun();
 
-	/**
-	 * Terminate benchmark runner process.
-	 */
-	public static void terminateRunner(BenchmarkRunStatus runnerInfo) {
+        LOG.info(String.format("Runner executing benchmark %s.", benchmarkRun.getId()));
 
-		LOG = LogManager.getLogger();
-		LOG.debug(String.format("Terminating benchmark runner."));
-		Process process = runnerInfo.getProcess();
-		int port = RunnerService.getRunnerPort();
+        // Start the timer
+        benchmarkStatus.setStartOfBenchmark();
 
-		// Check if the runner process is registered in the benchmark run log.
-		Integer processId = null;
-		try {
-			processId = retrieveRunnerProcessId(runnerInfo);
-			LOG.debug(String.format("Found runner process id %s", processId));
-		} catch (Exception e) {
-			LOG.error("Failed to find the process id for the runner process.");
-			throw new GraphalyticsExecutionException("Failed to find benchmark runner registration. Benchmark aborted.", e);
-		}
+        // Execute the benchmark and collect the result
+        try {
+            platform.run(runSpecification);
+            runned = true;
+        } catch (Exception ex) {
+            LOG.error("Algorithm \"" + benchmarkRun.getAlgorithm().getName() + "\" on graph \"" +
+                    benchmarkRun.getFormattedGraph().getGraph().getName() + " failed to complete:", ex);
+        }
 
-		// First attempt to terminate runner process gracefully.
-		LOG.debug("Terminating runner process gracefully.");
-		ProcessUtil.terminateProcess(process);
+        // Stop the timer
+        benchmarkStatus.setEndOfBenchmark();
 
-		boolean terminated = ProcessUtil.isNetworkPortAvailable(port) && !ProcessUtil.isProcessAlive(processId);
+        return runned;
+    }
 
-		LOG.debug(String.format("Runner process is %s: (process alive=%s, port available=%s)",
-				terminated ? "terminated" : "alive",
-				ProcessUtil.isProcessAlive(processId),
-				ProcessUtil.isNetworkPortAvailable(port)));
+    public boolean count(RunSpecification runSpecification) {
+        BenchmarkRunSetup benchmarkRunSetup = runSpecification.getBenchmarkRunSetup();
+        BenchmarkRun benchmarkRun = runSpecification.getBenchmarkRun();
 
-		while (!terminated) {
-			LOG.warn("Terminating runner process forcibly.");
-			try {
-				ProcessUtil.terminateProcess(processId);
-			} catch (Exception e) {
-				LOG.error("Failed to terminated runner process.", e);
-			}
+        if (benchmarkRunSetup.isValidationRequired()) {
+            try {
+                VertexCounter counter = new VertexCounter(benchmarkRunSetup.getOutputDir());
+                long expected = benchmarkRun.getGraph().getNumberOfVertices();
+                long parsed = counter.count();
+                if (parsed != expected) {
+                    return false;
+                }
+            } catch (ValidatorException e) {
+                LOG.error("Failed to count the number of outputs: " + e);
+                return false;
+            }
+        }
+        return true;
+    }
 
-			if(!terminated) {
-				LOG.error(String.format("Failed to kill runner process."));
-				TimeUtil.waitFor(10);
-			}
-			terminated = ProcessUtil.isNetworkPortAvailable(port) && !ProcessUtil.isProcessAlive(processId);
+    public boolean validate(RunSpecification runSpecification) {
+        BenchmarkRunSetup benchmarkRunSetup = runSpecification.getBenchmarkRunSetup();
+        BenchmarkRun benchmarkRun = runSpecification.getBenchmarkRun();
 
-			LOG.debug(String.format("Runner process is %s: (process alive=%s, port available=%s)",
-					terminated ? "terminated" : "alive",
-					ProcessUtil.isProcessAlive(processId),
-					ProcessUtil.isNetworkPortAvailable(port)));
-		}
-	}
+        boolean validated = true;
 
-	/**
-	 * Standard termination method for platform process when time-out occurs.
-	 * @param runSpecification
-	 */
-	public static void terminatePlatform(RunSpecification runSpecification) {
+        if (benchmarkRunSetup.isValidationRequired()) {
+            ValidationRule validationRule = benchmarkRun.getAlgorithm().getValidationRule();
 
-		LOG = LogManager.getLogger();
-		LOG.debug(String.format("Terminating platform process(es)."));
+            @SuppressWarnings("rawtypes")
+            VertexValidator<?> validator;
+            if (validationRule instanceof EpsilonValidationRule) {
+                validator = new DoubleVertexValidator(benchmarkRunSetup.getOutputDir(),
+                        benchmarkRunSetup.getValidationDir(),
+                        validationRule, true);
+            } else {
+                validator = new LongVertexValidator(benchmarkRunSetup.getOutputDir(),
+                        benchmarkRunSetup.getValidationDir(),
+                        validationRule, true);
+            }
 
-		BenchmarkRunSetup benchmarkRunSetup = runSpecification.getBenchmarkRunSetup();
+            try {
+                validated = validator.validate();
+            } catch (ValidatorException e) {
+                LOG.error("Failed to validate output: " + e);
+                validated = false;
+            }
+        }
 
-		Path pidFile = benchmarkRunSetup.getLogDir().resolve("platform").resolve("executable.pid");
-		if(pidFile.toFile().exists()) {
+        benchmarkStatus.setValidated(validated);
+        return validated;
+    }
 
-			Integer processId = null;
-			try {
-				processId =  Integer.parseInt((new String(readAllBytes(pidFile))).trim());
-				LOG.debug(String.format("Found platform process id " + processId));
-			} catch (Exception e) {
-				LOG.error(String.format("Failed to parse process id from executable.pid file.", e));
-				return;
-			}
+    public BenchmarkRunResult summarize(BenchmarkRun benchmarkRun, BenchmarkMetrics metrics) {
 
-			boolean terminated = !ProcessUtil.isProcessAlive(processId);
-			LOG.debug(String.format("Platform process %s is %s.", processId, terminated ? "terminated" : "alive"));
+        // calculate makespan
+        long makespanMS = (benchmarkStatus.getEndOfBenchmark().getTime() - benchmarkStatus.getStartOfBenchmark().getTime());
+        BigDecimal makespanS = (new BigDecimal(makespanMS)).divide(new BigDecimal(1000), 3, BigDecimal.ROUND_CEILING);
+        metrics.setMakespan(new BenchmarkMetric(makespanS, "s"));
 
-			while(!terminated) {
-				try {
-					LOG.warn(String.format("Terminating platform process forcibly."));
-					ProcessUtil.terminateProcess(processId);
-					terminated = !ProcessUtil.isProcessAlive(processId);
+        BenchmarkRunResult benchmarkRunResult =
+                new BenchmarkRunResult(benchmarkRun, benchmarkStatus, new BenchmarkFailures(), metrics);
 
-					if(!terminated) {
-						LOG.error(String.format("Failed to kill platform process."));
-						TimeUtil.waitFor(10);
-					}
-				} catch (Exception e) {
-					LOG.error(String.format("Failed to kill platform process."), e);
-				}
-			}
-		} else {
-			LOG.error("Failed to find the executable.pid file for platform process.");
-		}
-	}
+        return benchmarkRunResult;
+    }
 
+    public Platform getPlatform() {
+        return platform;
+    }
 
-	public static void registerRunnerProcessId(Path logDir) throws Exception {
-		Path pidFile = logDir.resolve("platform").resolve("runner.pid");
-		pidFile.toFile().getParentFile().mkdirs();
-		pidFile.toFile().createNewFile();
-		Files.write(pidFile, String.valueOf(ProcessUtil.getProcessId()).getBytes());
-	}
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
 
-	public static int retrieveRunnerProcessId(BenchmarkRunStatus runnerInfo) throws Exception {
-		Path pidFile = runnerInfo.getRunSpecification().getBenchmarkRunSetup().getLogDir().resolve("platform").resolve("runner.pid");
-		String content = new String(readAllBytes(pidFile));
-		return Integer.parseInt(content);
-	}
+    public String getBenchmarkId() {
+        return benchmarkId;
+    }
 
+    public void setBenchmarkId(String benchmarkId) {
+        this.benchmarkId = benchmarkId;
+    }
 
-	public Platform getPlatform() {
-		return platform;
-	}
+    public Plugins getPlugins() {
+        return plugins;
+    }
 
-	public void setPlatform(Platform platform) {
-		this.platform = platform;
-	}
+    public void setPlugins(Plugins plugins) {
+        this.plugins = plugins;
+    }
 
-	public String getBenchmarkId() {
-		return benchmarkId;
-	}
-
-	public void setBenchmarkId(String benchmarkId) {
-		this.benchmarkId = benchmarkId;
-	}
-
-	public Plugins getPlugins() {
-		return plugins;
-	}
-
-	public void setPlugins(Plugins plugins) {
-		this.plugins = plugins;
-	}
-
-	public void setService(RunnerService service) {
-		this.service = service;
-	}
+    public void setService(RunnerService service) {
+        this.service = service;
+    }
 }
