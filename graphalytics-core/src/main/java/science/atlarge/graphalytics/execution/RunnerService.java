@@ -139,7 +139,7 @@ public class RunnerService extends MircoService {
                 }
                 runner.startup(runSpecification);
             } catch (Exception e) {
-                LOG.error("Failed to startup benchmark run.");
+                LOG.error("Failed to startup benchmark run.", e);
                 reportFailure(BenchmarkFailure.INI);
                 throw new GraphalyticsExecutionException("Benchmark run aborted.", e);
             }
