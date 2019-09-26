@@ -136,7 +136,7 @@ public class BenchmarkRunner {
 					return false;
 				}
 			} catch (ValidatorException e) {
-				LOG.error("Failed to count the number of outputs: " + e);
+				LOG.error("Failed to count the number of outputs: ", e);
 				return false;
 			}
 		}
@@ -167,7 +167,7 @@ public class BenchmarkRunner {
 			try {
 				validated = validator.validate();
 			} catch (ValidatorException e) {
-				LOG.error("Failed to validate output: " + e);
+				LOG.error("Failed to validate output", e);
 				validated = false;
 			}
 		}

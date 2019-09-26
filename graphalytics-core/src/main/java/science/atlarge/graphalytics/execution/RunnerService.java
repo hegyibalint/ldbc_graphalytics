@@ -176,7 +176,7 @@ public class RunnerService extends MircoService {
                     reportFailure(BenchmarkFailure.VAL);
                 }
             } catch (Exception e) {
-                LOG.error("Failed to validate benchmark run.");
+                LOG.error("Failed to validate benchmark run.", e);
                 reportFailure(BenchmarkFailure.VAL);
                 throw new GraphalyticsExecutionException("Benchmark run aborted.", e);
             }
